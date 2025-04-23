@@ -1,0 +1,298 @@
+{% extends "base.html" %} {% load static %} {% block title %}Schedule Details{%
+endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col">
+      <h1>Schedule Details</h1>
+      <p class="text-muted">
+        View detailed information about your assigned duty
+      </p>
+    </div>
+    <div class="col-md-auto">
+      <a
+        href="{% url 'crew:crew_schedule_list' %}"
+        class="btn btn-outline-secondary"
+      >
+        <i class="fas fa-arrow-left"></i> Back to Schedules
+      </a>
+    </div>
+  </div>
+
+  <!-- Status Card -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              {% if schedule.flight %} Flight {{ schedule.flight.flight_number
+              }} {% else %} {{ schedule.get_duty_type_display }} {% endif %}
+            </h5>
+            <span
+              class="badge {% if schedule.status == 'confirmed' %}bg-success{% elif schedule.status == 'assigned' %}bg-primary{% elif schedule.status == 'tentative' %}bg-warning text-dark{% elif schedule.status == 'canceled' %}bg-danger{% elif schedule.status == 'checked_in' %}bg-info{% elif schedule.status == 'completed' %}bg-secondary{% elif schedule.status == 'reassigned' %}bg-dark{% endif %} fs-6"
+            >
+              {{ schedule.get_status_display }}
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-6">
+              <div class="mb-4">
+                <h6 class="text-muted">DUTY TYPE</h6>
+                <p class="fs-5">{{ schedule.get_duty_type_display }}</p>
+              </div>
+
+              <div class="mb-4">
+                <h6 class="text-muted">DATE</h6>
+                <p class="fs-5">{{ schedule.start_time|date:"l, F d, Y" }}</p>
+              </div>
+
+              <div class="mb-4">
+                <h6 class="text-muted">TIME</h6>
+                <p class="fs-5">
+                  {{ schedule.start_time|date:"H:i" }} - {{
+                  schedule.end_time|date:"H:i" }}
+                </p>
+              </div>
+
+              {% if schedule.duration_hours %}
+              <div class="mb-4">
+                <h6 class="text-muted">DURATION</h6>
+                <p class="fs-5">{{ schedule.duration_hours }} hours</p>
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+              {% if schedule.flight %}
+              <div class="mb-4">
+                <h6 class="text-muted">ROUTE</h6>
+                <p class="fs-5">
+                  {{ schedule.flight.origin.code }} → {{
+                  schedule.flight.destination.code }}
+                  <br />
+                  <span class="fs-6 text-muted"
+                    >{{ schedule.flight.origin.name }} to {{
+                    schedule.flight.destination.name }}</span
+                  >
+                </p>
+              </div>
+              {% endif %} {% if schedule.role %}
+              <div class="mb-4">
+                <h6 class="text-muted">ROLE</h6>
+                <p class="fs-5">{{ schedule.get_role_display }}</p>
+              </div>
+              {% endif %} {% if schedule.report_time %}
+              <div class="mb-4">
+                <h6 class="text-muted">REPORT TIME</h6>
+                <p class="fs-5">{{ schedule.report_time|date:"H:i" }}</p>
+              </div>
+              {% endif %} {% if schedule.aircraft %}
+              <div class="mb-4">
+                <h6 class="text-muted">AIRCRAFT</h6>
+                <p class="fs-5">
+                  {{ schedule.aircraft.registration }} ({{
+                  schedule.aircraft.aircraft_type.model }})
+                </p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Card -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Actions</h5>
+        </div>
+        <div class="card-body">
+          <div class="d-grid gap-3">
+            {% if schedule.status == 'confirmed' %}
+            <a
+              href="{% url 'crew:crew_schedule_check_in' schedule.id %}"
+              class="btn btn-success"
+            >
+              <i class="fas fa-check-circle"></i> Check In
+            </a>
+            {% endif %} {% if schedule.status == 'checked_in' %}
+            <a
+              href="{% url 'crew:crew_schedule_check_out' schedule.id %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-sign-out-alt"></i> Check Out
+            </a>
+            {% endif %}
+
+            <a
+              href="#"
+              onclick="window.open('/crew/schedules/{{ schedule.id }}/calendar.ics', '_blank')"
+              class="btn btn-outline-primary"
+            >
+              <i class="fas fa-calendar-plus"></i> Add to Calendar
+            </a>
+
+            <button class="btn btn-outline-secondary" onclick="window.print()">
+              <i class="fas fa-print"></i> Print Details
+            </button>
+          </div>
+
+          {% if schedule.check_in_time %}
+          <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle"></i> You checked in at {{
+            schedule.check_in_time|date:"H:i" }} on {{
+            schedule.check_in_time|date:"F d, Y" }}
+          </div>
+          {% endif %} {% if schedule.check_out_time %}
+          <div class="alert alert-success mt-3">
+            <i class="fas fa-info-circle"></i> You checked out at {{
+            schedule.check_out_time|date:"H:i" }} on {{
+            schedule.check_out_time|date:"F d, Y" }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notes and Additional Information -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <!-- Flight Details Card (if applicable) -->
+      {% if schedule.flight %}
+      <div class="card mb-4">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Flight Details</h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h6 class="text-muted">DEPARTURE</h6>
+                <p>
+                  <strong
+                    >{{ schedule.flight.departure_time|date:"H:i" }}</strong
+                  >
+                  on {{ schedule.flight.departure_time|date:"F d, Y" }}
+                  <br />
+                  <span class="text-muted"
+                    >{{ schedule.flight.origin.name }} ({{
+                    schedule.flight.origin.code }})</span
+                  >
+                  <br />
+                  <span class="text-muted"
+                    >Terminal: {{ schedule.flight.origin_terminal|default:"Main"
+                    }}</span
+                  >
+                </p>
+              </div>
+
+              <div class="mb-3">
+                <h6 class="text-muted">FLIGHT TIME</h6>
+                <p>{{ schedule.flight.duration }} minutes</p>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <h6 class="text-muted">ARRIVAL</h6>
+                <p>
+                  <strong>{{ schedule.flight.arrival_time|date:"H:i" }}</strong>
+                  on {{ schedule.flight.arrival_time|date:"F d, Y" }}
+                  <br />
+                  <span class="text-muted"
+                    >{{ schedule.flight.destination.name }} ({{
+                    schedule.flight.destination.code }})</span
+                  >
+                  <br />
+                  <span class="text-muted"
+                    >Terminal: {{
+                    schedule.flight.destination_terminal|default:"Main" }}</span
+                  >
+                </p>
+              </div>
+
+              <div class="mb-3">
+                <h6 class="text-muted">FLIGHT TYPE</h6>
+                <p>{{ schedule.flight.get_flight_type_display }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Notes Card -->
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Notes</h5>
+        </div>
+        <div class="card-body">
+          {% if schedule.notes %}
+          <p>{{ schedule.notes }}</p>
+          {% else %}
+          <p class="text-muted">No additional notes for this schedule.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Crew Assignment Card -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">Crew Assignment</h5>
+        </div>
+        <div class="card-body">
+          {% if schedule.flight and schedule.flight.crew_schedules.all %}
+          <ul class="list-group">
+            {% for crew_schedule in schedule.flight.crew_schedules.all %}
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <span class="fw-bold"
+                  >{{ crew_schedule.crew_member.user.get_full_name }}</span
+                >
+                <br />
+                <small class="text-muted"
+                  >{{ crew_schedule.get_role_display }}</small
+                >
+              </div>
+              <span class="badge bg-primary rounded-pill"
+                >{{ crew_schedule.crew_member.get_crew_type_display }}</span
+              >
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <p class="text-muted">No crew assignments available.</p>
+          {% endif %} {% if schedule.flight and schedule.flight.aircraft %}
+          <div class="mt-3">
+            <h6 class="text-muted">AIRCRAFT DETAILS</h6>
+            <p>
+              <strong>{{ schedule.flight.aircraft.registration }}</strong>
+              <br />
+              <span class="text-muted"
+                >{{ schedule.flight.aircraft.aircraft_type.manufacturer }} {{
+                schedule.flight.aircraft.aircraft_type.model }}</span
+              >
+              <br />
+              <span class="text-muted"
+                >Capacity: {{ schedule.flight.aircraft.passenger_capacity }}
+                passengers</span
+              >
+            </p>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

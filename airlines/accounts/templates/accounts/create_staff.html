@@ -1,0 +1,177 @@
+{% extends "base.html" %} {% load static %} {% block title %}Create Staff
+Account{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-user-plus me-2"></i>Create Staff Account
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+          <div class="messages">
+            {% for message in messages %}
+            <div
+              class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+              role="alert"
+            >
+              {{ message }}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <form method="post" action="{% url 'accounts:create_staff' %}">
+            {% csrf_token %}
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label for="first_name" class="form-label">First Name</label>
+                <div class="input-group">
+                  <span class="input-group-text"
+                    ><i class="fas fa-user"></i
+                  ></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="first_name"
+                    name="first_name"
+                    placeholder="Enter first name"
+                    required
+                  />
+                </div>
+              </div>
+              <div class="col-md-6 mb-3">
+                <label for="last_name" class="form-label">Last Name</label>
+                <div class="input-group">
+                  <span class="input-group-text"
+                    ><i class="fas fa-user"></i
+                  ></span>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="last_name"
+                    name="last_name"
+                    placeholder="Enter last name"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="email" class="form-label">Email address</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-envelope"></i
+                ></span>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  name="email"
+                  placeholder="Enter email"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="username" class="form-label">Username</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-user-tag"></i
+                ></span>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  placeholder="Choose a username"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="password" class="form-label">Password</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-lock"></i
+                ></span>
+                <input
+                  type="password"
+                  class="form-control"
+                  id="password"
+                  name="password"
+                  placeholder="Choose a password"
+                  required
+                  minlength="8"
+                />
+              </div>
+              <div class="form-text">
+                Password must be at least 8 characters long.
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="role" class="form-label">Role</label>
+              <div class="input-group">
+                <span class="input-group-text"
+                  ><i class="fas fa-user-shield"></i
+                ></span>
+                <select class="form-select" id="role" name="role" required>
+                  <option value="" disabled selected>Select a role</option>
+                  <option value="admin">Admin</option>
+                  <option value="planning_manager">Planning Manager</option>
+                  <option value="staff">Staff</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="alert alert-info">
+              <h5 class="alert-heading">
+                <i class="fas fa-info-circle me-2"></i>Role Permissions
+              </h5>
+              <hr />
+              <ul class="mb-0">
+                <li>
+                  <strong>Admin:</strong> Full access to all features and
+                  management functions.
+                </li>
+                <li>
+                  <strong>Planning Manager:</strong> Can manage flights,
+                  aircraft, and schedules.
+                </li>
+                <li>
+                  <strong>Staff:</strong> Limited access to customer service
+                  functions.
+                </li>
+              </ul>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-user-plus me-2"></i>Create Staff Account
+              </button>
+              <a
+                href="{% url 'accounts:index' %}"
+                class="btn btn-outline-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>Back
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ title }}</title>
+    <style>
+/* Base body styles */
+      body {
+        font-family: Arial, sans-serif;
+        line-height: 1.6;
+        color: #333;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+      }
+      header {
+        background-color: #0047ab;
+        color: white;
+        padding: 20px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        margin: 0;
+      }
+/* Container layout */
+      .container {
+        background-color: #f9f9f9;
+        border-radius: 5px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+/* Button styling */
+      .btn {
+        display: inline-block;
+        padding: 10px 15px;
+        background-color: #0047ab;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+        margin-right: 10px;
+      }
+/* Button styling */
+      .btn:hover {
+        background-color: #003380;
+      }
+      .search-form {
+        background-color: white;
+        padding: 30px;
+        border-radius: 5px;
+        margin: 20px 0;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      }
+/* Form elements */
+      .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+/* Form elements */
+      .form-group {
+        margin-bottom: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+      }
+      select, input {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+      }
+      th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+      }
+      th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+      }
+      tr:hover {
+        background-color: #f5f5f5;
+      }
+      .flight-status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        font-size: 0.9em;
+      }
+      .status-scheduled { background-color: #e5f6fd; color: #0277bd; }
+      .status-departed { background-color: #e8f5e9; color: #2e7d32; }
+      .status-in_air { background-color: #e3f2fd; color: #1565c0; }
+      .status-arrived { background-color: #e8f5e9; color: #2e7d32; }
+      .status-cancelled { background-color: #ffebee; color: #c62828; }
+      .status-delayed { background-color: #fff8e1; color: #ff8f00; }
+
+      .results-count {
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
+
+      .no-results {
+        background-color: #f5f5f5;
+        padding: 30px;
+        text-align: center;
+        border-radius: 5px;
+        margin: 20px 0;
+      }
+
+      .no-results h3 {
+        color: #555;
+        margin-top: 0;
+      }
+
+      footer {
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 1px solid #ccc;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>{{ title }}</h1>
+    </header>
+
+    <main>
+      <div class="container">
+        <a href="{% url 'flights:index' %}" class="btn">Back to Flight Management</a>
+        
+        <div class="search-form">
+          <h2>Search for Flights</h2>
+          <form method="get" action="{% url 'flights:flight_search' %}">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="origin">Origin Airport:</label>
+                <select name="origin" id="origin" required>
+                  <option value="">-- Select Origin --</option>
+                  {% for airport in airports %}
+                    <option value="{{ airport.code }}" {% if request.GET.origin == airport.code %}selected{% endif %}>
+                      {{ airport.code }} - {{ airport.name }} ({{ airport.city }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+              
+              <div class="form-group">
+                <label for="destination">Destination Airport:</label>
+                <select name="destination" id="destination" required>
+                  <option value="">-- Select Destination --</option>
+                  {% for airport in airports %}
+                    <option value="{{ airport.code }}" {% if request.GET.destination == airport.code %}selected{% endif %}>
+                      {{ airport.code }} - {{ airport.name }} ({{ airport.city }})
+                    </option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit" class="btn">Search Flights</button>
+          </form>
+        </div>
+        
+        {% if request.GET.origin and request.GET.destination %}
+          {% if flights %}
+            <div class="results-count">
+              Found {{ flights|length }} flight(s) from 
+              <strong>{{ request.GET.origin }}</strong> to 
+              <strong>{{ request.GET.destination }}</strong>
+            </div>
+            
+            <table>
+              <thead>
+                <tr>
+                  <th>Flight #</th>
+                  <th>Origin</th>
+                  <th>Destination</th>
+                  <th>Scheduled Departure</th>
+                  <th>Scheduled Arrival</th>
+                  <th>Aircraft</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for flight in flights %}
+                  <tr>
+                    <td>{{ flight.flight_number }}</td>
+                    <td>{{ flight.origin.code }} ({{ flight.origin.city }})</td>
+                    <td>{{ flight.destination.code }} ({{ flight.destination.city }})</td>
+                    <td>{{ flight.scheduled_departure|date:"d M Y H:i" }}</td>
+                    <td>{{ flight.scheduled_arrival|date:"d M Y H:i" }}</td>
+                    <td>{% if flight.aircraft %}{{ flight.aircraft.registration }}{% else %}TBA{% endif %}</td>
+                    <td><span class="flight-status status-{{ flight.status }}">{{ flight.get_status_display }}</span></td>
+                    <td><a href="{% url 'flights:flight_detail' flight.id %}" class="btn">Details</a></td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <div class="no-results">
+              <h3>No flights found</h3>
+              <p>No flights were found from {{ request.GET.origin }} to {{ request.GET.destination }}.</p>
+              <p>Please try a different route or check back later.</p>
+            </div>
+          {% endif %}
+        {% endif %}
+      </div>
+    </main>
+    
+    <footer>
+      <p>&copy; 2025 Airlines Booking System. All rights reserved.</p>
+    </footer>
+  </body>
+</html> 

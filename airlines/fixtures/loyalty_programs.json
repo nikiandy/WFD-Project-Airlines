@@ -1,0 +1,486 @@
+[
+  {
+    "model": "passengers.loyaltyprogram",
+    "pk": 1,
+    "fields": {
+      "name": "SkyMiles",
+      "description": "Our premium loyalty program offering exclusive benefits and rewards",
+      "code": "SKYM",
+      "point_expiry_months": 24,
+      "status_period_months": 12,
+      "min_miles_per_flight": 500,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltyprogram",
+    "pk": 2,
+    "fields": {
+      "name": "Elite Club",
+      "description": "Exclusive program for our most frequent flyers with premium benefits",
+      "code": "ELTC",
+      "point_expiry_months": 36,
+      "status_period_months": 12,
+      "min_miles_per_flight": 750,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2023-06-15T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltytier",
+    "pk": 1,
+    "fields": {
+      "program": 1,
+      "name": "Blue",
+      "level": 1,
+      "description": "Entry level tier with basic benefits",
+      "qualification_miles": 0,
+      "qualification_segments": 0,
+      "qualification_spend": "0.00",
+      "points_multiplier": 1.0,
+      "priority_checkin": false,
+      "priority_boarding": false,
+      "extra_baggage_allowance": 0,
+      "lounge_access": false,
+      "upgrade_eligibility": false,
+      "partner_benefits": false,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltytier",
+    "pk": 2,
+    "fields": {
+      "program": 1,
+      "name": "Silver",
+      "level": 2,
+      "description": "Mid-level tier with enhanced benefits",
+      "qualification_miles": 25000,
+      "qualification_segments": 30,
+      "qualification_spend": "3000.00",
+      "points_multiplier": 1.25,
+      "priority_checkin": true,
+      "priority_boarding": true,
+      "extra_baggage_allowance": 1,
+      "lounge_access": false,
+      "upgrade_eligibility": true,
+      "partner_benefits": false,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltytier",
+    "pk": 3,
+    "fields": {
+      "program": 1,
+      "name": "Gold",
+      "level": 3,
+      "description": "Premium tier with comprehensive benefits",
+      "qualification_miles": 50000,
+      "qualification_segments": 60,
+      "qualification_spend": "6000.00",
+      "points_multiplier": 1.5,
+      "priority_checkin": true,
+      "priority_boarding": true,
+      "extra_baggage_allowance": 1,
+      "lounge_access": true,
+      "upgrade_eligibility": true,
+      "partner_benefits": true,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltytier",
+    "pk": 4,
+    "fields": {
+      "program": 1,
+      "name": "Platinum",
+      "level": 4,
+      "description": "Elite tier with exclusive privileges and personalized service",
+      "qualification_miles": 75000,
+      "qualification_segments": 90,
+      "qualification_spend": "9000.00",
+      "points_multiplier": 2.0,
+      "priority_checkin": true,
+      "priority_boarding": true,
+      "extra_baggage_allowance": 2,
+      "lounge_access": true,
+      "upgrade_eligibility": true,
+      "partner_benefits": true,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltytier",
+    "pk": 5,
+    "fields": {
+      "program": 2,
+      "name": "Elite Basic",
+      "level": 1,
+      "description": "Basic membership in the Elite Club",
+      "qualification_miles": 0,
+      "qualification_segments": 0,
+      "qualification_spend": "0.00",
+      "points_multiplier": 1.0,
+      "priority_checkin": false,
+      "priority_boarding": false,
+      "extra_baggage_allowance": 0,
+      "lounge_access": false,
+      "upgrade_eligibility": false,
+      "partner_benefits": false,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltytier",
+    "pk": 6,
+    "fields": {
+      "program": 2,
+      "name": "Elite Premium",
+      "level": 2,
+      "description": "Premium membership in the Elite Club with enhanced benefits",
+      "qualification_miles": 100000,
+      "qualification_segments": 100,
+      "qualification_spend": "12000.00",
+      "points_multiplier": 2.5,
+      "priority_checkin": true,
+      "priority_boarding": true,
+      "extra_baggage_allowance": 2,
+      "lounge_access": true,
+      "upgrade_eligibility": true,
+      "partner_benefits": true,
+      "created_at": "2022-01-01T00:00:00Z",
+      "updated_at": "2022-01-01T00:00:00Z",
+      "is_active": true
+    }
+  },
+  {
+    "model": "passengers.loyaltymembership",
+    "pk": 1,
+    "fields": {
+      "passenger": 1,
+      "program": 1,
+      "membership_number": "SM10012345",
+      "tier": 2,
+      "join_date": "2022-03-15",
+      "expiry_date": "2025-03-15",
+      "points_balance": 35000,
+      "miles_balance": 35000,
+      "miles_ytd": 12500,
+      "segments_ytd": 15,
+      "spend_ytd": "3500.00",
+      "lifetime_miles": 60000,
+      "lifetime_segments": 72,
+      "lifetime_spend": "7500.00",
+      "is_active": true,
+      "created_at": "2022-03-15T10:30:00Z",
+      "updated_at": "2023-12-20T14:15:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltymembership",
+    "pk": 2,
+    "fields": {
+      "passenger": 3,
+      "program": 1,
+      "membership_number": "SM10034567",
+      "tier": 3,
+      "join_date": "2021-08-10",
+      "expiry_date": "2024-08-10",
+      "points_balance": 64000,
+      "miles_balance": 64000,
+      "miles_ytd": 28500,
+      "segments_ytd": 32,
+      "spend_ytd": "6800.00",
+      "lifetime_miles": 125000,
+      "lifetime_segments": 145,
+      "lifetime_spend": "15200.00",
+      "is_active": true,
+      "created_at": "2021-08-10T08:45:00Z",
+      "updated_at": "2023-12-15T11:30:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltymembership",
+    "pk": 3,
+    "fields": {
+      "passenger": 5,
+      "program": 1,
+      "membership_number": "SM10056789",
+      "tier": 1,
+      "join_date": "2023-01-20",
+      "expiry_date": "2026-01-20",
+      "points_balance": 12500,
+      "miles_balance": 12500,
+      "miles_ytd": 12500,
+      "segments_ytd": 8,
+      "spend_ytd": "1850.00",
+      "lifetime_miles": 12500,
+      "lifetime_segments": 8,
+      "lifetime_spend": "1850.00",
+      "is_active": true,
+      "created_at": "2023-01-20T15:20:00Z",
+      "updated_at": "2023-11-30T09:15:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltymembership",
+    "pk": 4,
+    "fields": {
+      "passenger": 8,
+      "program": 2,
+      "membership_number": "EC20012345",
+      "tier": 6,
+      "join_date": "2022-05-18",
+      "expiry_date": "2025-05-18",
+      "points_balance": 180000,
+      "miles_balance": 180000,
+      "miles_ytd": 115000,
+      "segments_ytd": 110,
+      "spend_ytd": "18500.00",
+      "lifetime_miles": 280000,
+      "lifetime_segments": 270,
+      "lifetime_spend": "36000.00",
+      "is_active": true,
+      "created_at": "2022-05-18T11:45:00Z",
+      "updated_at": "2023-12-28T10:30:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltymembership",
+    "pk": 5,
+    "fields": {
+      "passenger": 9,
+      "program": 1,
+      "membership_number": "SM10089012",
+      "tier": 4,
+      "join_date": "2020-11-05",
+      "expiry_date": "2023-11-05",
+      "points_balance": 95000,
+      "miles_balance": 95000,
+      "miles_ytd": 82000,
+      "segments_ytd": 95,
+      "spend_ytd": "12800.00",
+      "lifetime_miles": 320000,
+      "lifetime_segments": 380,
+      "lifetime_spend": "42500.00",
+      "is_active": true,
+      "created_at": "2020-11-05T09:20:00Z",
+      "updated_at": "2023-12-22T16:45:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 1,
+    "fields": {
+      "membership": 1,
+      "transaction_date": "2023-03-15T14:30:00Z",
+      "transaction_type": "flight_credit",
+      "points": 1500,
+      "miles": 1500,
+      "reference_code": "FL10015689",
+      "description": "Flight DUB-LHR",
+      "expiry_date": "2025-03-15",
+      "status": "completed",
+      "created_at": "2023-03-15T14:30:00Z",
+      "updated_at": "2023-03-15T14:30:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 2,
+    "fields": {
+      "membership": 1,
+      "transaction_date": "2023-05-22T16:15:00Z",
+      "transaction_type": "flight_credit",
+      "points": 2800,
+      "miles": 2800,
+      "reference_code": "FL10027845",
+      "description": "Flight DUB-JFK",
+      "expiry_date": "2025-05-22",
+      "status": "completed",
+      "created_at": "2023-05-22T16:15:00Z",
+      "updated_at": "2023-05-22T16:15:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 3,
+    "fields": {
+      "membership": 1,
+      "transaction_date": "2023-08-10T10:45:00Z",
+      "transaction_type": "flight_credit",
+      "points": 3200,
+      "miles": 3200,
+      "reference_code": "FL10039614",
+      "description": "Flight DUB-DXB",
+      "expiry_date": "2025-08-10",
+      "status": "completed",
+      "created_at": "2023-08-10T10:45:00Z",
+      "updated_at": "2023-08-10T10:45:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 4,
+    "fields": {
+      "membership": 1,
+      "transaction_date": "2023-11-15T13:20:00Z",
+      "transaction_type": "redemption",
+      "points": -5000,
+      "miles": -5000,
+      "reference_code": "RD10005784",
+      "description": "Upgrade to Business Class",
+      "status": "completed",
+      "created_at": "2023-11-15T13:20:00Z",
+      "updated_at": "2023-11-15T13:20:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 5,
+    "fields": {
+      "membership": 2,
+      "transaction_date": "2023-04-18T11:30:00Z",
+      "transaction_type": "flight_credit",
+      "points": 4500,
+      "miles": 4500,
+      "reference_code": "FL10022365",
+      "description": "Flight SFO-LHR",
+      "expiry_date": "2025-04-18",
+      "status": "completed",
+      "created_at": "2023-04-18T11:30:00Z",
+      "updated_at": "2023-04-18T11:30:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 6,
+    "fields": {
+      "membership": 2,
+      "transaction_date": "2023-07-25T09:15:00Z",
+      "transaction_type": "flight_credit",
+      "points": 6200,
+      "miles": 6200,
+      "reference_code": "FL10034722",
+      "description": "Flight JFK-SIN",
+      "expiry_date": "2025-07-25",
+      "status": "completed",
+      "created_at": "2023-07-25T09:15:00Z",
+      "updated_at": "2023-07-25T09:15:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 7,
+    "fields": {
+      "membership": 2,
+      "transaction_date": "2023-10-08T15:40:00Z",
+      "transaction_type": "partner_credit",
+      "points": 2000,
+      "miles": 2000,
+      "reference_code": "PT10008547",
+      "description": "Hotel Stay - Marriott",
+      "expiry_date": "2025-10-08",
+      "status": "completed",
+      "created_at": "2023-10-08T15:40:00Z",
+      "updated_at": "2023-10-08T15:40:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 8,
+    "fields": {
+      "membership": 2,
+      "transaction_date": "2023-12-05T12:10:00Z",
+      "transaction_type": "redemption",
+      "points": -10000,
+      "miles": -10000,
+      "reference_code": "RD10006932",
+      "description": "Award Flight",
+      "status": "completed",
+      "created_at": "2023-12-05T12:10:00Z",
+      "updated_at": "2023-12-05T12:10:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 9,
+    "fields": {
+      "membership": 4,
+      "transaction_date": "2023-03-30T10:25:00Z",
+      "transaction_type": "flight_credit",
+      "points": 8500,
+      "miles": 8500,
+      "reference_code": "FL10021458",
+      "description": "Flight TYO-DXB",
+      "expiry_date": "2026-03-30",
+      "status": "completed",
+      "created_at": "2023-03-30T10:25:00Z",
+      "updated_at": "2023-03-30T10:25:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 10,
+    "fields": {
+      "membership": 4,
+      "transaction_date": "2023-06-15T14:50:00Z",
+      "transaction_type": "flight_credit",
+      "points": 7600,
+      "miles": 7600,
+      "reference_code": "FL10029876",
+      "description": "Flight TYO-SYD",
+      "expiry_date": "2026-06-15",
+      "status": "completed",
+      "created_at": "2023-06-15T14:50:00Z",
+      "updated_at": "2023-06-15T14:50:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 11,
+    "fields": {
+      "membership": 4,
+      "transaction_date": "2023-09-20T11:35:00Z",
+      "transaction_type": "tier_bonus",
+      "points": 25000,
+      "miles": 25000,
+      "reference_code": "TB10002145",
+      "description": "Elite Premium Tier Bonus",
+      "expiry_date": "2026-09-20",
+      "status": "completed",
+      "created_at": "2023-09-20T11:35:00Z",
+      "updated_at": "2023-09-20T11:35:00Z"
+    }
+  },
+  {
+    "model": "passengers.loyaltytransaction",
+    "pk": 12,
+    "fields": {
+      "membership": 4,
+      "transaction_date": "2023-11-28T16:20:00Z",
+      "transaction_type": "redemption",
+      "points": -15000,
+      "miles": -15000,
+      "reference_code": "RD10007851",
+      "description": "First Class Upgrade",
+      "status": "completed",
+      "created_at": "2023-11-28T16:20:00Z",
+      "updated_at": "2023-11-28T16:20:00Z"
+    }
+  }
+]

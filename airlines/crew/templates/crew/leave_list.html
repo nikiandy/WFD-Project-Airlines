@@ -1,0 +1,213 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Leave Requests{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>My Leave Requests</h1>
+            <p class="text-muted">View and manage your leave requests</p>
+        </div>
+        <div class="col-md-auto">
+            <a href="{% url 'crew:crew_leave_request' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Request New Leave
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filter Requests</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'crew:crew_leave_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="leave_type">Leave Type</label>
+                            <select class="form-select" id="leave_type" name="leave_type">
+                                <option value="">All Types</option>
+                                <option value="annual" {% if request.GET.leave_type == 'annual' %}selected{% endif %}>Annual Leave</option>
+                                <option value="sick" {% if request.GET.leave_type == 'sick' %}selected{% endif %}>Sick Leave</option>
+                                <option value="compassionate" {% if request.GET.leave_type == 'compassionate' %}selected{% endif %}>Compassionate Leave</option>
+                                <option value="maternity" {% if request.GET.leave_type == 'maternity' %}selected{% endif %}>Maternity Leave</option>
+                                <option value="paternity" {% if request.GET.leave_type == 'paternity' %}selected{% endif %}>Paternity Leave</option>
+                                <option value="unpaid" {% if request.GET.leave_type == 'unpaid' %}selected{% endif %}>Unpaid Leave</option>
+                                <option value="training" {% if request.GET.leave_type == 'training' %}selected{% endif %}>Training Leave</option>
+                                <option value="special" {% if request.GET.leave_type == 'special' %}selected{% endif %}>Special Leave</option>
+                                <option value="compensatory" {% if request.GET.leave_type == 'compensatory' %}selected{% endif %}>Compensatory Off</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending Approval</option>
+                                <option value="approved" {% if request.GET.status == 'approved' %}selected{% endif %}>Approved</option>
+                                <option value="denied" {% if request.GET.status == 'denied' %}selected{% endif %}>Denied</option>
+                                <option value="canceled" {% if request.GET.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-4 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Leave Requests List -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Leave Requests ({{ leaves|length }})</h5>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Leave Type</th>
+                        <th>Period</th>
+                        <th>Duration</th>
+                        <th>Status</th>
+                        <th>Requested</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for leave in leaves %}
+                    <tr>
+                        <td>
+                            <span class="fw-bold">{{ leave.get_leave_type_display }}</span>
+                        </td>
+                        <td>
+                            <div>{{ leave.start_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">to {{ leave.end_date|date:"M d, Y" }}</small>
+                        </td>
+                        <td>
+                            {{ leave.duration_days }} days
+                        </td>
+                        <td>
+                            {% if leave.status == 'approved' %}
+                                <span class="badge bg-success">Approved</span>
+                            {% elif leave.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending Approval</span>
+                            {% elif leave.status == 'denied' %}
+                                <span class="badge bg-danger">Denied</span>
+                            {% elif leave.status == 'canceled' %}
+                                <span class="badge bg-secondary">Canceled</span>
+                            {% elif leave.status == 'completed' %}
+                                <span class="badge bg-info">Completed</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {{ leave.requested_at|date:"M d, Y" }}
+                        </td>
+                        <td>
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#leaveDetails{{ leave.id }}">
+                                        <i class="fas fa-eye fa-fw"></i> View Details
+                                    </a></li>
+                                    {% if leave.status == 'pending' %}
+                                        <li><a class="dropdown-item text-danger" href="{% url 'crew:crew_leave_cancel' leave.id %}">
+                                            <i class="fas fa-times-circle fa-fw"></i> Cancel Request
+                                        </a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                            
+                            <!-- Leave Details Modal -->
+                            <div class="modal fade" id="leaveDetails{{ leave.id }}" tabindex="-1" aria-labelledby="leaveDetailsLabel{{ leave.id }}" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="leaveDetailsLabel{{ leave.id }}">Leave Request Details</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Leave Type</h6>
+                                                <p>{{ leave.get_leave_type_display }}</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Period</h6>
+                                                <p>From {{ leave.start_date|date:"F d, Y" }} to {{ leave.end_date|date:"F d, Y" }}</p>
+                                                <p class="text-muted">{{ leave.duration_days }} days</p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Status</h6>
+                                                <p>
+                                                    {% if leave.status == 'approved' %}
+                                                        <span class="badge bg-success">Approved</span>
+                                                    {% elif leave.status == 'pending' %}
+                                                        <span class="badge bg-warning text-dark">Pending Approval</span>
+                                                    {% elif leave.status == 'denied' %}
+                                                        <span class="badge bg-danger">Denied</span>
+                                                    {% elif leave.status == 'canceled' %}
+                                                        <span class="badge bg-secondary">Canceled</span>
+                                                    {% elif leave.status == 'completed' %}
+                                                        <span class="badge bg-info">Completed</span>
+                                                    {% endif %}
+                                                </p>
+                                            </div>
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Reason</h6>
+                                                <p>{{ leave.reason }}</p>
+                                            </div>
+                                            {% if leave.approved_by %}
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Approved/Denied By</h6>
+                                                <p>{{ leave.approved_by.get_full_name }} on {{ leave.approved_at|date:"F d, Y" }}</p>
+                                            </div>
+                                            {% endif %}
+                                            {% if leave.approval_notes %}
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">Notes</h6>
+                                                <p>{{ leave.approval_notes }}</p>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            {% if leave.status == 'pending' %}
+                                                <a href="{% url 'crew:crew_leave_cancel' leave.id %}" class="btn btn-danger">Cancel Request</a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                                <h5>No leave requests found</h5>
+                                <p>You haven't requested any leave yet</p>
+                                <a href="{% url 'crew:crew_leave_request' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Request New Leave
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

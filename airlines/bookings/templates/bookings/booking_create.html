@@ -1,0 +1,557 @@
+{% extends "base.html" %} {% load static %} {% block title %}Create New
+Booking{% endblock %} {% block extra_css %}
+<style>
+/* Table styling */
+  .table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    cursor: pointer;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-plane-departure me-2 text-primary"></i>
+        Book a Flight
+      </h1>
+      <p class="lead text-muted">
+        Enter your flight details and passenger information
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <form method="post" id="booking-form" class="needs-validation" novalidate>
+        {% csrf_token %}
+
+        <!-- Flight Search Section -->
+        <div class="card mb-4 shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-search me-2"></i>
+              Find Your Flight
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="tripType"
+                  id="oneWay"
+                  value="oneWay"
+                  checked
+                />
+                <label class="form-check-label" for="oneWay">One Way</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="tripType"
+                  id="roundTrip"
+                  value="roundTrip"
+                />
+                <label class="form-check-label" for="roundTrip"
+                  >Round Trip</label
+                >
+              </div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="origin" class="form-label">From</label>
+                <select class="form-select" id="origin" name="origin" required>
+                  <option value="">Select Departure Airport</option>
+                  {% for airport in airports %}
+                  <option value="{{ airport.code }}">
+                    {{ airport.name }} ({{ airport.code }})
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select a departure airport.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="destination" class="form-label">To</label>
+                <select
+                  class="form-select"
+                  id="destination"
+                  name="destination"
+                  required
+                >
+                  <option value="">Select Arrival Airport</option>
+                  {% for airport in airports %}
+                  <option value="{{ airport.code }}">
+                    {{ airport.name }} ({{ airport.code }})
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">
+                  Please select an arrival airport.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="departureDate" class="form-label"
+                  >Departure Date</label
+                >
+                <input
+                  type="date"
+                  class="form-control"
+                  id="departureDate"
+                  name="departureDate"
+                  required
+                  min="{{ today|date:'Y-m-d' }}"
+                />
+                <div class="invalid-feedback">
+                  Please select a valid departure date.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="returnDate" class="form-label">Return Date</label>
+                <input
+                  type="date"
+                  class="form-control"
+                  id="returnDate"
+                  name="returnDate"
+                  disabled
+                />
+                <div class="invalid-feedback">
+                  Please select a valid return date.
+                </div>
+              </div>
+
+              <div class="col-md-6">
+                <label for="flightClass" class="form-label">Class</label>
+                <select
+                  class="form-select"
+                  id="flightClass"
+                  name="flightClass"
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {% for travel_class in travel_classes %}
+                  <option value="{{ travel_class.code }}">
+                    {{ travel_class.name }}
+                  </option>
+                  {% endfor %}
+                </select>
+                <div class="invalid-feedback">Please select a class.</div>
+              </div>
+              <div class="col-md-6">
+                <label for="passengers" class="form-label">Passengers</label>
+                <div class="input-group">
+                  <span class="input-group-text">
+                    <i class="fas fa-users"></i>
+                  </span>
+                  <select
+                    class="form-select"
+                    id="adultPassengers"
+                    name="adultPassengers"
+                    required
+                  >
+                    <option value="1" selected>1 Adult</option>
+                    <option value="2">2 Adults</option>
+                    <option value="3">3 Adults</option>
+                    <option value="4">4 Adults</option>
+                    <option value="5">5 Adults</option>
+                  </select>
+                  <select
+                    class="form-select"
+                    id="childPassengers"
+                    name="childPassengers"
+                  >
+                    <option value="0" selected>0 Children</option>
+                    <option value="1">1 Child</option>
+                    <option value="2">2 Children</option>
+                    <option value="3">3 Children</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="col-12 text-center">
+                <button
+                  type="button"
+                  id="searchFlights"
+                  class="btn btn-primary btn-lg"
+                >
+                  <i class="fas fa-search me-2"></i>
+                  Search Flights
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Flight Selection Section (initially hidden) -->
+        <div id="flightSelection" class="card mb-4 shadow-sm d-none">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-plane me-2"></i>
+              Select Your Flight
+            </h3>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-hover mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th>Flight</th>
+                    <th>Route</th>
+                    <th>Time</th>
+                    <th>Duration</th>
+                    <th>Price</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="flightResults">
+                  <!-- Flight results will be populated here by JavaScript -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Passenger Information Section (initially hidden) -->
+        <div id="passengerInfo" class="card mb-4 shadow-sm d-none">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-user me-2"></i>
+              Passenger Information
+            </h3>
+          </div>
+          <div class="card-body">
+            <div id="passengerForms">
+              <!-- Passenger forms will be generated here by JavaScript -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Contact Information Section (initially hidden) -->
+        <div id="contactInfo" class="card mb-4 shadow-sm d-none">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-address-card me-2"></i>
+              Contact Information
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label for="contactEmail" class="form-label"
+                  >Email Address</label
+                >
+                <input
+                  type="email"
+                  class="form-control"
+                  id="contactEmail"
+                  name="contact_email"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Please provide a valid email address.
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label for="contactPhone" class="form-label"
+                  >Phone Number</label
+                >
+                <input
+                  type="tel"
+                  class="form-control"
+                  id="contactPhone"
+                  name="contact_phone"
+                  required
+                />
+                <div class="invalid-feedback">
+                  Please provide a valid phone number.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add-Ons Section (initially hidden) -->
+        <div id="addonsSection" class="card mb-4 shadow-sm d-none">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-plus-circle me-2"></i>
+              Additional Services
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <i class="fas fa-suitcase me-2 text-primary"></i>
+                      Baggage Options
+                    </h5>
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="extraBaggage"
+                        name="extra_baggage"
+                      />
+                      <label class="form-check-label" for="extraBaggage">
+                        Extra checked baggage (+€35 per passenger)
+                      </label>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="sportEquipment"
+                        name="sport_equipment"
+                      />
+                      <label class="form-check-label" for="sportEquipment">
+                        Sports equipment (+€65)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">
+                      <i class="fas fa-concierge-bell me-2 text-primary"></i>
+                      Additional Services
+                    </h5>
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="priorityBoarding"
+                        name="priority_boarding"
+                      />
+                      <label class="form-check-label" for="priorityBoarding">
+                        Priority boarding (+€15 per passenger)
+                      </label>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="premiumMeal"
+                        name="premium_meal"
+                      />
+                      <label class="form-check-label" for="premiumMeal">
+                        Premium meal selection (+€20 per passenger)
+                      </label>
+                    </div>
+                    <div class="form-check mb-2">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="travelInsurance"
+                        name="travel_insurance"
+                      />
+                      <label class="form-check-label" for="travelInsurance">
+                        Travel insurance (+€25 per passenger)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Section (initially hidden) -->
+        <div id="paymentSection" class="card mb-4 shadow-sm d-none">
+          <div class="card-header bg-primary text-white">
+            <h3 class="mb-0">
+              <i class="fas fa-credit-card me-2"></i>
+              Payment Information
+            </h3>
+          </div>
+          <div class="card-body">
+            <div class="mb-4">
+              <h5 class="mb-3">Payment Method</h5>
+              <div class="form-check form-check-inline mb-2">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="payment_method"
+                  id="creditCard"
+                  value="credit_card"
+                  checked
+                  required
+                />
+                <label class="form-check-label" for="creditCard">
+                  <i class="fab fa-cc-visa me-1"></i>
+                  <i class="fab fa-cc-mastercard me-1"></i>
+                  Credit Card
+                </label>
+              </div>
+              <div class="form-check form-check-inline mb-2">
+                <input
+                  class="form-check-input"
+                  type="radio"
+                  name="payment_method"
+                  id="paypal"
+                  value="paypal"
+                />
+                <label class="form-check-label" for="paypal">
+                  <i class="fab fa-paypal me-1"></i>
+                  PayPal
+                </label>
+              </div>
+            </div>
+
+            <div id="creditCardDetails">
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label for="cardholderName" class="form-label"
+                    >Cardholder Name</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cardholderName"
+                    name="cardholder_name"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label for="cardNumber" class="form-label">Card Number</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cardNumber"
+                    name="card_number"
+                    placeholder="XXXX XXXX XXXX XXXX"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="expiryDate" class="form-label">Expiry Date</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="expiryDate"
+                    name="expiry_date"
+                    placeholder="MM/YY"
+                  />
+                </div>
+                <div class="col-md-4">
+                  <label for="cvv" class="form-label">CVV</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="cvv"
+                    name="cvv"
+                    placeholder="XXX"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="d-grid">
+          <button
+            type="submit"
+            id="submitBooking"
+            class="btn btn-lg btn-success"
+            disabled
+          >
+            <i class="fas fa-check-circle me-2"></i>
+            Complete Booking
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      <!-- Booking Summary -->
+      <div class="card shadow-sm sticky-top" style="top: 20px">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-receipt me-2"></i>
+            Booking Summary
+          </h3>
+        </div>
+        <div class="card-body">
+          <div id="empty-selection" class="text-center py-4">
+            <i class="fas fa-plane-departure fa-3x text-muted mb-3"></i>
+            <p class="lead text-muted">
+              Search and select a flight to see your booking summary
+            </p>
+          </div>
+
+          <div id="booking-summary" class="d-none">
+            <h5>Selected Flight</h5>
+            <div class="row g-3">
+              <div class="col-12">
+                <div class="card bg-light">
+                  <div class="card-body">
+                    <div class="d-flex justify-content-between mb-2">
+                      <div>
+                        <span id="summary-flight-number" class="fw-bold"
+                          >SK123</span
+                        >
+                      </div>
+                      <div>
+                        <span id="summary-flight-date">Wed, 12 Apr</span>
+                      </div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                      <div>
+                        <h5 id="summary-origin-code" class="mb-0">DUB</h5>
+                        <small id="summary-departure-time" class="text-muted"
+                          >08:30</small
+                        >
+                      </div>
+                      <div class="text-center">
+                        <i class="fas fa-plane text-primary"></i>
+                        <div class="border-top">
+                          <small id="summary-duration">2h 15m</small>
+                        </div>
+                      </div>
+                      <div class="text-end">
+                        <h5 id="summary-destination-code" class="mb-0">LHR</h5>
+                        <small id="summary-arrival-time" class="text-muted"
+                          >10:45</small
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <hr />
+
+            <h5>Price Details</h5>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Base fare</span>
+              <span id="summary-base-fare">€179.99</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Taxes & fees</span>
+              <span id="summary-taxes">€27.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-3">
+              <span>Additional services</span>
+              <span id="summary-addons">€0.00</span>
+            </div>
+            <div class="d-flex justify-content-between fw-bold">
+              <span>Total</span>
+              <span id="summary-total" class="text-primary">€206.99</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extrajs %}
+<script src="{% static 'bookings/js/booking.js' %}"></script>
+{% endblock %}

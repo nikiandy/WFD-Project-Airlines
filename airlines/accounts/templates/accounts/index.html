@@ -1,0 +1,262 @@
+{% extends "base.html" %} {% load static %} {% block title %}Account
+Management{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-user-cog me-2 text-primary"></i>
+        Account Management
+      </h1>
+      <p class="lead text-muted">
+        Manage your personal profile, security settings, and payment methods
+      </p>
+    </div>
+    <div class="col-md-4 text-end align-self-center">
+      {% if user.is_authenticated %}
+      <div class="btn-group">
+        <a
+          href="{% url 'accounts:edit_profile' %}"
+          class="btn btn-outline-primary"
+        >
+          <i class="fas fa-user-edit me-2"></i>
+          Edit Profile
+        </a>
+        <a href="{% url 'accounts:logout' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-sign-out-alt me-2"></i>
+          Logout
+        </a>
+      </div>
+      {% if user.is_staff or user.role == 'admin' %}
+      <a href="{% url 'accounts:create_staff' %}" class="btn btn-success ms-2">
+        <i class="fas fa-user-plus me-2"></i>
+        Create Staff
+      </a>
+      {% endif %} {% else %}
+      <div class="btn-group">
+        <a href="{% url 'accounts:login' %}" class="btn btn-primary">
+          <i class="fas fa-sign-in-alt me-2"></i>
+          Login
+        </a>
+        <a href="{% url 'accounts:signup' %}" class="btn btn-outline-primary">
+          <i class="fas fa-user-plus me-2"></i>
+          Sign Up
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {% if user.is_authenticated %}
+  <div class="row">
+    <!-- Profile Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-user text-primary me-2"></i>
+            Personal Profile
+          </h5>
+          <div class="d-flex align-items-center mb-3">
+            <div class="bg-light rounded-circle p-3 me-3">
+              <i class="fas fa-user-circle fa-3x text-secondary"></i>
+            </div>
+            <div>
+              <h6 class="mb-1">{{ user.get_full_name }}</h6>
+              <p class="text-muted mb-0">{{ user.email }}</p>
+              <p class="text-muted mb-0">
+                {{ profile.phone_number|default:"+XXX XX XXX XXXX" }}
+              </p>
+            </div>
+          </div>
+          <hr />
+          <div class="mb-3">
+            <strong class="text-muted">Member since:</strong> {{
+            date_joined|date:"F j, Y" }}<br />
+            <strong class="text-muted">Last login:</strong> {{
+            last_login|date:"F j, Y, g:i A" }}
+          </div>
+          <a href="{% url 'accounts:edit_profile' %}" class="btn btn-primary"
+            >Edit Profile</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- Security Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-shield-alt text-primary me-2"></i>
+            Security Settings
+          </h5>
+          <p class="card-text">
+            Manage your password and account security options.
+          </p>
+
+          <div class="list-group mb-3">
+            <div
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Password
+              <a
+                href="{% url 'accounts:password_reset' %}"
+                class="btn btn-sm btn-outline-primary"
+                >Change</a
+              >
+            </div>
+            <div
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Two-Factor Authentication
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="twoFactorToggle"
+                />
+              </div>
+            </div>
+            <div
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Login Notifications
+              <div class="form-check form-switch">
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  id="loginNotificationsToggle"
+                  checked
+                />
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="alert alert-success d-flex align-items-center"
+            role="alert"
+          >
+            <i class="fas fa-check-circle me-2"></i>
+            <div>Your account security is strong!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Bookings Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-ticket-alt text-primary me-2"></i>
+            Recent Bookings
+          </h5>
+          {% if recent_bookings %}
+          <div class="list-group mb-3">
+            {% for booking in recent_bookings %}
+            <a
+              href="#"
+              class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            >
+              <div>
+                <div>Booking #{{ booking.reference_number|default:"N/A" }}</div>
+                <small class="text-muted"
+                  >{{ booking.created_at|date:"M d, Y"|default:"Unknown date"
+                  }}</small
+                >
+              </div>
+              <span
+                class="badge {% if booking.status == 'confirmed' %}bg-success{% elif booking.status == 'pending' %}bg-warning{% elif booking.status == 'cancelled' %}bg-danger{% else %}bg-info{% endif %}"
+              >
+                {{
+                booking.get_status_display|default:booking.status|default:"Unknown"
+                }}
+              </span>
+            </a>
+            {% endfor %}
+          </div>
+          <a href="/" class="btn btn-outline-primary">View All Bookings</a>
+          {% else %}
+          <p class="text-muted">You don't have any bookings yet.</p>
+          <a href="/" class="btn btn-primary">Book a Flight</a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Communication Preferences Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-envelope text-primary me-2"></i>
+            Communication Preferences
+          </h5>
+          <p class="card-text">Manage how we communicate with you.</p>
+
+          <div class="mb-3">
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="emailPromoToggle"
+                checked
+              />
+              <label class="form-check-label" for="emailPromoToggle">
+                Promotional emails
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="emailBookingToggle"
+                checked
+              />
+              <label class="form-check-label" for="emailBookingToggle">
+                Booking confirmations
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="emailFlightToggle"
+                checked
+              />
+              <label class="form-check-label" for="emailFlightToggle">
+                Flight status updates
+              </label>
+            </div>
+            <div class="form-check form-switch">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="smsToggle"
+                checked
+              />
+              <label class="form-check-label" for="smsToggle">
+                SMS notifications
+              </label>
+            </div>
+          </div>
+
+          <a href="#" class="btn btn-primary">Update Preferences</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="alert alert-info">
+    <p>
+      Please <a href="{% url 'accounts:login' %}">login</a> to access your
+      account information.
+    </p>
+    <p>
+      Don't have an account?
+      <a href="{% url 'accounts:signup' %}">Sign up</a> now!
+    </p>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

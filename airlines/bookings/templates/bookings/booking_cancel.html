@@ -1,0 +1,175 @@
+{% extends "base.html" %} {% load static %} {% block title %}Cancel Booking{%
+endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+          <h2 class="mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Cancel Booking
+          </h2>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning">
+            <h4 class="alert-heading">
+              Are you sure you want to cancel this booking?
+            </h4>
+            <p>
+              This action cannot be undone. Refund policies will apply based on
+              the time of cancellation.
+            </p>
+          </div>
+
+          <div class="mb-4">
+            <h3>Booking Details</h3>
+            <div class="row">
+              <div class="col-md-6">
+                <p>
+                  <strong>Reference Number:</strong> {{ booking.reference_number
+                  }}
+                </p>
+                <p>
+                  <strong>Booking Date:</strong> {{ booking.created_at|date:"F
+                  d, Y" }}
+                </p>
+                <p>
+                  <strong>Total Amount:</strong> ${{
+                  booking.total_amount|floatformat:2 }}
+                </p>
+              </div>
+              <div class="col-md-6">
+                <p>
+                  <strong>Status:</strong>
+                  <span
+                    class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning{% else %}secondary{% endif %}"
+                    >{{ booking.get_status_display }}</span
+                  >
+                </p>
+                <p>
+                  <strong>Payment Status:</strong>
+                  <span
+                    class="badge bg-{% if booking.is_paid %}success{% else %}danger{% endif %}"
+                    >{% if booking.is_paid %}Paid{% else %}Unpaid{% endif
+                    %}</span
+                  >
+                </p>
+                <p>
+                  <strong>Passengers:</strong> {{ booking.passenger_count }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <h3>Cancellation Policy</h3>
+            {% with pb=booking.get_first_passenger_booking %} {% if pb and
+            pb.flight %} {% with flight_date=pb.flight.departure_time %} {% now
+            "Y-m-d" as today %} {% if flight_date|date:"Y-m-d" == today %}
+            <div class="alert alert-danger">
+              <p>
+                <strong>Same-day cancellation:</strong> No refund will be
+                issued.
+              </p>
+            </div>
+            {% elif flight_date|timesince < "24 hours" %}
+            <div class="alert alert-warning">
+              <p>
+                <strong>Less than 24 hours before departure:</strong> 25% refund
+                will be issued.
+              </p>
+            </div>
+            {% elif flight_date|timesince < "72 hours" %}
+            <div class="alert alert-info">
+              <p>
+                <strong>Less than 72 hours before departure:</strong> 50% refund
+                will be issued.
+              </p>
+            </div>
+            {% else %}
+            <div class="alert alert-success">
+              <p>
+                <strong>More than 72 hours before departure:</strong> 85% refund
+                will be issued.
+              </p>
+            </div>
+            {% endif %} {% endwith %} {% else %}
+            <div class="alert alert-info">
+              <p>
+                Standard cancellation policy applies. Please contact customer
+                service for details.
+              </p>
+            </div>
+            {% endif %} {% endwith %}
+          </div>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3">
+              <label for="cancellationReason" class="form-label"
+                >Reason for Cancellation (Optional)</label
+              >
+              <select
+                class="form-select"
+                id="cancellationReason"
+                name="cancellation_reason"
+              >
+                <option value="">-- Select a reason --</option>
+                <option value="change_of_plans">Change of Plans</option>
+                <option value="found_better_price">Found Better Price</option>
+                <option value="schedule_conflict">Schedule Conflict</option>
+                <option value="travel_restriction">Travel Restriction</option>
+                <option value="medical">Medical Reason</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label for="additionalComments" class="form-label"
+                >Additional Comments (Optional)</label
+              >
+              <textarea
+                class="form-control"
+                id="additionalComments"
+                name="additional_comments"
+                rows="3"
+              ></textarea>
+            </div>
+
+            <div class="form-check mb-3">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                id="confirmCancel"
+                name="confirm_cancel"
+                required
+              />
+              <label class="form-check-label" for="confirmCancel">
+                I understand that by cancelling this booking, I agree to the
+                refund policy stated above.
+              </label>
+              <div class="invalid-feedback">
+                You must agree to the cancellation terms.
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'bookings:booking_detail' booking.reference_number %}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-arrow-left me-2"></i>
+                Return to Booking
+              </a>
+              <button type="submit" class="btn btn-danger">
+                <i class="fas fa-times-circle me-2"></i>
+                Confirm Cancellation
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

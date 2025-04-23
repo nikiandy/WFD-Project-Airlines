@@ -1,0 +1,111 @@
+{% extends "base.html" %} {% load static %} {% block title %}Sky Airlines -
+Home{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="bg-light p-4 rounded shadow-sm">
+        <h1 class="display-4">Welcome to Sky Airlines</h1>
+        <p class="lead">
+          Your journey, our priority. Access all our services from one place.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <i class="fas fa-plane fa-3x text-primary mb-3"></i>
+          <h2 class="card-title h4">Flight Management</h2>
+          <p class="card-text">
+            Browse available flights, check schedules, and get information about
+            routes and aircraft.
+          </p>
+        </div>
+        <div class="card-footer bg-white text-center border-top-0">
+          <a href="/flights/" class="btn btn-primary">Explore Flights</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <i class="fas fa-ticket-alt fa-3x text-primary mb-3"></i>
+          <h2 class="card-title h4">Booking Management</h2>
+          <p class="card-text">
+            Book flights, manage reservations, and view your booking history.
+          </p>
+        </div>
+        <div class="card-footer bg-white text-center border-top-0">
+          <a href="/bookings/" class="btn btn-primary">Manage Bookings</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <i class="fas fa-user fa-3x text-primary mb-3"></i>
+          <h2 class="card-title h4">Passenger Services</h2>
+          <p class="card-text">
+            Update passenger information, manage frequent flyer accounts, and
+            view travel history.
+          </p>
+        </div>
+        <div class="card-footer bg-white text-center border-top-0">
+          <a href="/passengers/" class="btn btn-primary">Passenger Services</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <i class="fas fa-users fa-3x text-primary mb-3"></i>
+          <h2 class="card-title h4">Crew Portal</h2>
+          <p class="card-text">
+            For airline crew members to manage schedules, qualifications, and
+            leave requests.
+          </p>
+        </div>
+        <div class="card-footer bg-white text-center border-top-0">
+          <a href="/crew/" class="btn btn-primary">Crew Portal</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <i class="fas fa-user-cog fa-3x text-primary mb-3"></i>
+          <h2 class="card-title h4">Account Management</h2>
+          <p class="card-text">
+            Manage your account, update personal information, and change your
+            password.
+          </p>
+        </div>
+        <div class="card-footer bg-white text-center border-top-0">
+          <a href="/accounts/" class="btn btn-primary">My Account</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4 mb-4">
+      <div class="card h-100 shadow-sm">
+        <div class="card-body text-center">
+          <i class="fas fa-cogs fa-3x text-primary mb-3"></i>
+          <h2 class="card-title h4">Admin Panel</h2>
+          <p class="card-text">
+            For administrators to manage the entire system (restricted access).
+          </p>
+        </div>
+        <div class="card-footer bg-white text-center border-top-0">
+          <a href="/admin/" class="btn btn-primary">Admin Panel</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

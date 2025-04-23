@@ -1,0 +1,356 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Edit Booking{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="display-5 fw-bold">
+                <i class="fas fa-edit me-2 text-primary"></i>
+                Edit Booking
+            </h1>
+            <p class="lead text-muted">Update details for booking <strong>{{ booking.reference_number }}</strong></p>
+        </div>
+        <div class="col-md-4 d-flex align-items-center justify-content-md-end">
+            <a href="{% url 'bookings:booking_detail' booking.reference_number %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Booking
+            </a>
+        </div>
+    </div>
+    
+    <form method="post" id="edit-booking-form" class="needs-validation" novalidate>
+        {% csrf_token %}
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Contact Information -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-address-card me-2"></i>
+                            Contact Information
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="contactEmail" class="form-label">Email Address</label>
+                                <input type="email" class="form-control" id="contactEmail" name="contact_email" value="{{ booking.contact_email }}" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid email address.
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="contactPhone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="contactPhone" name="contact_phone" value="{{ booking.contact_phone }}" required>
+                                <div class="invalid-feedback">
+                                    Please provide a valid phone number.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Passenger Information -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            Passenger Information
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        {% for pb in passenger_bookings %}
+                            <div class="card mb-3">
+                                <div class="card-header {% if pb.passenger.is_adult %}bg-info{% else %}bg-warning{% endif %} bg-opacity-25">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <h5 class="mb-0">
+                                            Passenger #{{ forloop.counter }}: {{ pb.passenger.get_full_name }}
+                                        </h5>
+                                        <span class="badge {% if pb.passenger.is_adult %}bg-info{% else %}bg-warning{% endif %}">
+                                            {% if pb.passenger.is_adult %}Adult{% else %}Child{% endif %}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <label for="firstName{{ forloop.counter }}" class="form-label">First Name</label>
+                                            <input type="text" class="form-control" id="firstName{{ forloop.counter }}" name="passenger_{{ pb.id }}_first_name" value="{{ pb.passenger.first_name }}" required>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="middleName{{ forloop.counter }}" class="form-label">Middle Name</label>
+                                            <input type="text" class="form-control" id="middleName{{ forloop.counter }}" name="passenger_{{ pb.id }}_middle_name" value="{{ pb.passenger.middle_name|default:'' }}">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="lastName{{ forloop.counter }}" class="form-label">Last Name</label>
+                                            <input type="text" class="form-control" id="lastName{{ forloop.counter }}" name="passenger_{{ pb.id }}_last_name" value="{{ pb.passenger.last_name }}" required>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="dateOfBirth{{ forloop.counter }}" class="form-label">Date of Birth</label>
+                                            <input type="date" class="form-control" id="dateOfBirth{{ forloop.counter }}" name="passenger_{{ pb.id }}_date_of_birth" value="{{ pb.passenger.date_of_birth|date:'Y-m-d' }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="gender{{ forloop.counter }}" class="form-label">Gender</label>
+                                            <select class="form-select" id="gender{{ forloop.counter }}" name="passenger_{{ pb.id }}_gender" required>
+                                                <option value="">Select Gender</option>
+                                                <option value="male" {% if pb.passenger.gender == 'male' %}selected{% endif %}>Male</option>
+                                                <option value="female" {% if pb.passenger.gender == 'female' %}selected{% endif %}>Female</option>
+                                                <option value="other" {% if pb.passenger.gender == 'other' %}selected{% endif %}>Other</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="col-md-6">
+                                            <label for="passportNumber{{ forloop.counter }}" class="form-label">Passport Number</label>
+                                            <input type="text" class="form-control" id="passportNumber{{ forloop.counter }}" name="passenger_{{ pb.id }}_passport_number" value="{{ pb.passenger.passport_number|default:'' }}">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="passportExpiry{{ forloop.counter }}" class="form-label">Passport Expiry Date</label>
+                                            <input type="date" class="form-control" id="passportExpiry{{ forloop.counter }}" name="passenger_{{ pb.id }}_passport_expiry" value="{{ pb.passenger.passport_expiry|date:'Y-m-d'|default:'' }}">
+                                        </div>
+                                        
+                                        <div class="col-12">
+                                            <label for="specialRequests{{ forloop.counter }}" class="form-label">Special Requests</label>
+                                            <textarea class="form-control" id="specialRequests{{ forloop.counter }}" name="passenger_{{ pb.id }}_special_requests" rows="2">{{ pb.passenger.special_requirements|default:'' }}</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Additional Services -->
+                <div class="card mb-4 shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-concierge-bell me-2"></i>
+                            Additional Services
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Baggage Options</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Extra Baggage</label>
+                                            <div class="input-group">
+                                                <input type="number" class="form-control" id="extraBaggage" name="extra_baggage" min="0" max="10" value="{{ booking.extra_baggage|default:0 }}">
+                                                <span class="input-group-text">pieces</span>
+                                            </div>
+                                            <div class="form-text">
+                                                Additional fee per piece: $35.00
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="oversizedBaggage" name="oversized_baggage" {% if booking.has_oversized_baggage %}checked{% endif %}>
+                                            <label class="form-check-label" for="oversizedBaggage">
+                                                Oversized Baggage (>23kg)
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="sportEquipment" name="sport_equipment" {% if booking.has_sport_equipment %}checked{% endif %}>
+                                            <label class="form-check-label" for="sportEquipment">
+                                                Sports Equipment
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="card mb-3">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Meal Preferences</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label for="mealPreference" class="form-label">Select Meal Type</label>
+                                            <select class="form-select" id="mealPreference" name="meal_preference">
+                                                <option value="standard" {% if booking.meal_preference == 'standard' %}selected{% endif %}>Standard Meal</option>
+                                                <option value="vegetarian" {% if booking.meal_preference == 'vegetarian' %}selected{% endif %}>Vegetarian</option>
+                                                <option value="vegan" {% if booking.meal_preference == 'vegan' %}selected{% endif %}>Vegan</option>
+                                                <option value="gluten_free" {% if booking.meal_preference == 'gluten_free' %}selected{% endif %}>Gluten Free</option>
+                                                <option value="kosher" {% if booking.meal_preference == 'kosher' %}selected{% endif %}>Kosher</option>
+                                                <option value="halal" {% if booking.meal_preference == 'halal' %}selected{% endif %}>Halal</option>
+                                                <option value="diabetic" {% if booking.meal_preference == 'diabetic' %}selected{% endif %}>Diabetic</option>
+                                                <option value="low_sodium" {% if booking.meal_preference == 'low_sodium' %}selected{% endif %}>Low Sodium</option>
+                                            </select>
+                                        </div>
+                                        
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="premiumMeal" name="premium_meal" {% if booking.has_premium_meal %}checked{% endif %}>
+                                            <label class="form-check-label" for="premiumMeal">
+                                                Upgrade to Premium Meal (+$15.00)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Other Services</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="priorityBoarding" name="priority_boarding" {% if booking.has_priority_boarding %}checked{% endif %}>
+                                            <label class="form-check-label" for="priorityBoarding">
+                                                Priority Boarding (+$10.00)
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" id="travelInsurance" name="travel_insurance" {% if booking.has_travel_insurance %}checked{% endif %}>
+                                            <label class="form-check-label" for="travelInsurance">
+                                                Travel Insurance (+$25.00)
+                                            </label>
+                                        </div>
+                                        
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" id="airportPickup" name="airport_pickup" {% if booking.has_airport_pickup %}checked{% endif %}>
+                                            <label class="form-check-label" for="airportPickup">
+                                                Airport Pickup (+$45.00)
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="fas fa-save me-2"></i>
+                        Save Changes
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Booking Summary Column -->
+            <div class="col-lg-4">
+                <div class="card shadow-sm sticky-top" style="top: 20px;">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0">
+                            <i class="fas fa-receipt me-2"></i>
+                            Booking Summary
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold">Booking Reference:</span>
+                                <span>{{ booking.reference_number }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold">Status:</span>
+                                <span class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning{% elif booking.status == 'cancelled' %}danger{% else %}info{% endif %}">
+                                    {{ booking.get_status_display }}
+                                </span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="fw-bold">Booking Date:</span>
+                                <span>{{ booking.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                        
+                        <hr>
+                        
+                        {% with pb=booking.get_first_passenger_booking %}
+                            {% if pb and pb.flight %}
+                                <h5>Flight Information</h5>
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="me-auto">
+                                        <span class="badge bg-primary me-2">{{ pb.flight.flight_number }}</span>
+                                        <span class="small text-muted">{{ pb.flight.departure_time|date:"D, M d, Y" }}</span>
+                                    </div>
+                                    <span class="badge rounded-pill bg-secondary">{{ pb.flight_class|upper }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <div class="text-center">
+                                        <h5 class="mb-0">{{ pb.flight.origin.code }}</h5>
+                                        <p class="small text-muted mb-0">{{ pb.flight.departure_time|date:"H:i" }}</p>
+                                    </div>
+                                    <div class="flex-grow-1 px-2 text-center">
+                                        <div class="flight-path">
+                                            <i class="fas fa-plane"></i>
+                                        </div>
+                                    </div>
+                                    <div class="text-center">
+                                        <h5 class="mb-0">{{ pb.flight.destination.code }}</h5>
+                                        <p class="small text-muted mb-0">{{ pb.flight.arrival_time|date:"H:i" }}</p>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
+                        
+                        <hr>
+                        
+                        <h5 class="mb-3">Price Breakdown</h5>
+                        <div id="price-breakdown">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Base Fare:</span>
+                                <span>${{ booking.base_amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Taxes & Fees:</span>
+                                <span>${{ booking.tax_amount|floatformat:2 }}</span>
+                            </div>
+                            {% if booking.discount_amount > 0 %}
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Discount:</span>
+                                <span class="text-success">-${{ booking.discount_amount|floatformat:2 }}</span>
+                            </div>
+                            {% endif %}
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Additional Services:</span>
+                                <span>${{ booking.additional_services_amount|floatformat:2 }}</span>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between fw-bold">
+                                <span>Total:</span>
+                                <span>${{ booking.total_amount|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info mt-4 mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Changes to your booking may affect the total price.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize page when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+
+        const form = document.getElementById('edit-booking-form');
+
+        form.addEventListener('submit', function(event) {
+// Conditional logic
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+
+            form.classList.add('was-validated');
+        });
+    });
+</script>
+{% endblock %} 

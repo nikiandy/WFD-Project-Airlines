@@ -1,0 +1,189 @@
+{% extends "base.html" %} {% load static %} {% block title %}Delete Flight {{
+flight.flight_number }}{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold text-danger">
+        <i class="fas fa-trash-alt me-2"></i>
+        Delete Flight
+      </h1>
+      <p class="lead">
+        You are about to permanently delete flight
+        <strong>{{ flight.flight_number }}</strong>. This action cannot be
+        undone.
+      </p>
+    </div>
+    <div class="col-md-4 text-end align-self-center">
+      <a
+        href="{% url 'flights:flight_detail' flight.id %}"
+        class="btn btn-outline-secondary"
+      >
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Flight
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8 mx-auto">
+      <div class="card border-danger shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Warning: Deletion Confirmation
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-warning mb-4">
+            <h4 class="alert-heading">
+              <i class="fas fa-info-circle me-2"></i>
+              Flight Details
+            </h4>
+            <p>Please confirm that this is the flight you want to delete:</p>
+            <div class="row mt-3">
+              <div class="col-md-6">
+                <ul class="list-group">
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="fas fa-plane-departure me-2 text-primary"></i>
+                      Flight Number:</span
+                    >
+                    <span class="badge bg-primary"
+                      >{{ flight.flight_number }}</span
+                    >
+                  </li>
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="fas fa-map-marker-alt me-2 text-success"></i>
+                      From:</span
+                    >
+                    <span class="badge bg-success"
+                      >{{ flight.origin.name }} ({{ flight.origin.code }})</span
+                    >
+                  </li>
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="fas fa-map-marker-alt me-2 text-danger"></i>
+                      To:</span
+                    >
+                    <span class="badge bg-danger"
+                      >{{ flight.destination.name }} ({{ flight.destination.code
+                      }})</span
+                    >
+                  </li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <ul class="list-group">
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="fas fa-calendar-alt me-2 text-info"></i>
+                      Departure:</span
+                    >
+                    <span class="badge bg-info text-dark"
+                      >{{ flight.scheduled_departure|date:"D, d M Y H:i"
+                      }}</span
+                    >
+                  </li>
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="fas fa-calendar-alt me-2 text-info"></i>
+                      Arrival:</span
+                    >
+                    <span class="badge bg-info text-dark"
+                      >{{ flight.scheduled_arrival|date:"D, d M Y H:i" }}</span
+                    >
+                  </li>
+                  <li
+                    class="list-group-item d-flex justify-content-between align-items-center"
+                  >
+                    <span
+                      ><i class="fas fa-check-circle me-2 text-warning"></i>
+                      Status:</span
+                    >
+                    <span class="badge bg-warning text-dark"
+                      >{{ flight.get_status_display }}</span
+                    >
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert alert-danger mb-4">
+            <h4 class="alert-heading">
+              <i class="fas fa-exclamation-triangle me-2"></i>
+              Important Consequences
+            </h4>
+            <p>Deleting this flight will:</p>
+            <ul>
+              <li>Remove the flight from the schedule</li>
+              <li>Cancel all associated bookings</li>
+              <li>Delete all passenger records for this flight</li>
+              <li>Remove this flight from any searches</li>
+            </ul>
+            <p class="mb-0">
+              This action cannot be reversed. All data will be permanently lost.
+            </p>
+          </div>
+
+          <form method="post">
+            {% csrf_token %}
+            <div class="mb-3 form-check">
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="confirmDelete"
+                required
+              />
+              <label class="form-check-label" for="confirmDelete">
+                I understand that this action cannot be undone and will
+                permanently delete this flight and all associated data.
+              </label>
+            </div>
+            <div class="d-flex justify-content-between">
+              <a
+                href="{% url 'flights:flight_detail' flight.id %}"
+                class="btn btn-secondary"
+              >
+                <i class="fas fa-times me-2"></i>
+                Cancel
+              </a>
+              <button
+                type="submit"
+                class="btn btn-danger"
+                id="deleteButton"
+                disabled
+              >
+                <i class="fas fa-trash-alt me-2"></i>
+                Delete Flight
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const confirmCheckbox = document.getElementById("confirmDelete");
+    const deleteButton = document.getElementById("deleteButton");
+
+    confirmCheckbox.addEventListener("change", function () {
+      deleteButton.disabled = !this.checked;
+    });
+  });
+</script>
+{% endblock %}

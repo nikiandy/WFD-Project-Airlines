@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Flight Schedules{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>My Flight Schedules</h1>
+            <p class="text-muted">View your assigned duties, flights, and training sessions</p>
+        </div>
+        <div class="col-md-auto">
+            <a href="{% url 'crew:crew_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Search & Filter</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'crew:crew_schedule_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="start_date">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date" value="{{ start_date|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="end_date">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date" value="{{ end_date|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="duty_type">Duty Type</label>
+                            <select class="form-select" id="duty_type" name="duty_type">
+                                <option value="">All Types</option>
+                                <option value="flight" {% if request.GET.duty_type == 'flight' %}selected{% endif %}>Flight Duty</option>
+                                <option value="standby" {% if request.GET.duty_type == 'standby' %}selected{% endif %}>Standby Duty</option>
+                                <option value="reserve" {% if request.GET.duty_type == 'reserve' %}selected{% endif %}>Reserve Duty</option>
+                                <option value="training" {% if request.GET.duty_type == 'training' %}selected{% endif %}>Training</option>
+                                <option value="ground" {% if request.GET.duty_type == 'ground' %}selected{% endif %}>Ground Duty</option>
+                                <option value="office" {% if request.GET.duty_type == 'office' %}selected{% endif %}>Office Duty</option>
+                                <option value="simulator" {% if request.GET.duty_type == 'simulator' %}selected{% endif %}>Simulator Session</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="tentative" {% if request.GET.status == 'tentative' %}selected{% endif %}>Tentative</option>
+                                <option value="assigned" {% if request.GET.status == 'assigned' %}selected{% endif %}>Assigned</option>
+                                <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                <option value="checked_in" {% if request.GET.status == 'checked_in' %}selected{% endif %}>Checked In</option>
+                                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                                <option value="canceled" {% if request.GET.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                <option value="reassigned" {% if request.GET.status == 'reassigned' %}selected{% endif %}>Reassigned</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label for="date_range">Quick Date Range</label>
+                            <select class="form-select" id="date_range" name="date_range" onchange="updateDateRange(this.value)">
+                                <option value="">Custom Range</option>
+                                <option value="today" {% if request.GET.date_range == 'today' %}selected{% endif %}>Today</option>
+                                <option value="tomorrow" {% if request.GET.date_range == 'tomorrow' %}selected{% endif %}>Tomorrow</option>
+                                <option value="this_week" {% if request.GET.date_range == 'this_week' %}selected{% endif %}>This Week</option>
+                                <option value="next_week" {% if request.GET.date_range == 'next_week' %}selected{% endif %}>Next Week</option>
+                                <option value="this_month" {% if request.GET.date_range == 'this_month' %}selected{% endif %}>This Month</option>
+                                <option value="next_month" {% if request.GET.date_range == 'next_month' %}selected{% endif %}>Next Month</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Schedule Statistics -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-primary">
+                <div class="card-body">
+                    <h5 class="card-title">Flight Hours</h5>
+                    <p class="card-text display-6">{{ flight_hours|default:"0" }}</p>
+                    <p class="card-text">This month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Upcoming Duties</h5>
+                    <p class="card-text display-6">{{ upcoming_count|default:"0" }}</p>
+                    <p class="card-text">Next 7 days</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Training Hours</h5>
+                    <p class="card-text display-6">{{ training_hours|default:"0" }}</p>
+                    <p class="card-text">This month</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Rest Time</h5>
+                    <p class="card-text display-6">{{ rest_hours|default:"0" }}</p>
+                    <p class="card-text">Required hours</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Schedules List -->
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Schedules ({{ schedules|length }})</h5>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'crew:export_schedules' %}?format=csv{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">CSV</a></li>
+                    <li><a class="dropdown-item" href="{% url 'crew:export_schedules' %}?format=pdf{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">PDF</a></li>
+                    <li><a class="dropdown-item" href="#" onclick="window.print()">Print View</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Duty Type</th>
+                        <th>Flight / Assignment</th>
+                        <th>Date & Time</th>
+                        <th>Location</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for schedule in schedules %}
+                    <tr>
+                        <td>
+                            <span class="fw-bold">{{ schedule.get_duty_type_display }}</span>
+                            {% if schedule.role %}
+                            <br><small class="text-muted">{{ schedule.get_role_display }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if schedule.flight %}
+                                <div class="fw-bold">{{ schedule.flight.flight_number }}</div>
+                                <small class="text-muted">{{ schedule.flight.origin.code }} → {{ schedule.flight.destination.code }}</small>
+                                {% if schedule.aircraft %}
+                                <br><small class="text-muted">Aircraft: {{ schedule.aircraft.registration }}</small>
+                                {% endif %}
+                            {% elif schedule.duty_type == 'training' %}
+                                <div>Training Session</div>
+                                <small class="text-muted">{{ schedule.notes|truncatechars:40 }}</small>
+                            {% elif schedule.duty_type == 'simulator' %}
+                                <div>Simulator Training</div>
+                                <small class="text-muted">{{ schedule.notes|truncatechars:40 }}</small>
+                            {% elif schedule.duty_type == 'standby' %}
+                                <div>Standby Duty</div>
+                                <small class="text-muted">{{ schedule.notes|truncatechars:40 }}</small>
+                            {% else %}
+                                <div>{{ schedule.notes|truncatechars:40 }}</div>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="fw-bold">{{ schedule.start_time|date:"D, M d, Y" }}</div>
+                            <div>{{ schedule.start_time|date:"H:i" }} - {{ schedule.end_time|date:"H:i" }}</div>
+                            {% if schedule.report_time %}
+                            <small class="text-muted">Report: {{ schedule.report_time|date:"H:i" }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if schedule.departure_airport %}
+                                {{ schedule.departure_airport.code }}
+                                {% if schedule.arrival_airport %}
+                                    → {{ schedule.arrival_airport.code }}
+                                {% endif %}
+                            {% else %}
+                                {{ schedule.crew_member.base_airport.code }}
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if schedule.status == 'confirmed' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elif schedule.status == 'assigned' %}
+                                <span class="badge bg-primary">Assigned</span>
+                            {% elif schedule.status == 'tentative' %}
+                                <span class="badge bg-warning text-dark">Tentative</span>
+                            {% elif schedule.status == 'canceled' %}
+                                <span class="badge bg-danger">Canceled</span>
+                            {% elif schedule.status == 'checked_in' %}
+                                <span class="badge bg-info">Checked In</span>
+                            {% elif schedule.status == 'completed' %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% elif schedule.status == 'reassigned' %}
+                                <span class="badge bg-dark">Reassigned</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ schedule.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ schedule.id }}">
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'crew:crew_schedule_detail' schedule.id %}">
+                                            <i class="fas fa-eye fa-fw"></i> View Details
+                                        </a>
+                                    </li>
+                                    {% if schedule.status == 'confirmed' %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'crew:crew_schedule_check_in' schedule.id %}">
+                                            <i class="fas fa-check-circle fa-fw"></i> Check In
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    {% if schedule.status == 'checked_in' %}
+                                    <li>
+                                        <a class="dropdown-item" href="{% url 'crew:crew_schedule_check_out' schedule.id %}">
+                                            <i class="fas fa-sign-out-alt fa-fw"></i> Check Out
+                                        </a>
+                                    </li>
+                                    {% endif %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item" href="#" onclick="window.open('/crew/schedules/{{ schedule.id }}/calendar.ics', '_blank')">
+                                            <i class="fas fa-calendar-plus fa-fw"></i> Add to Calendar
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-calendar-times fa-3x mb-3"></i>
+                                <h5>No schedules found</h5>
+                                <p>Try changing your filter criteria or check back later</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+{% block extra_js %}
+<script>
+// Function definition
+function updateDateRange(value) {
+// Conditional logic
+    if (value) {
+
+        document.getElementById('start_date').value = '';
+        document.getElementById('end_date').value = '';
+    }
+}
+</script>
+{% endblock %}
+{% endblock %}

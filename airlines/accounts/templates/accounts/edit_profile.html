@@ -1,0 +1,220 @@
+{% extends "base.html" %} {% load static %} {% block title %}Edit Profile - Sky
+Airlines{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-user-edit me-2 text-primary"></i>
+        Edit Profile
+      </h1>
+      <p class="lead text-muted">
+        Update your personal information and travel documents
+      </p>
+    </div>
+    <div class="col-md-4 text-end">
+      <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Profile
+      </a>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="messages mb-4">
+    {% for message in messages %}
+    <div
+      class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+      role="alert"
+    >
+      {{ message }}
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-lg-8">
+      <form
+        method="post"
+        action="{% url 'accounts:profile' %}"
+        class="card shadow"
+      >
+        {% csrf_token %}
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-user me-2"></i>Personal Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="first_name" class="form-label">First Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="first_name"
+                name="first_name"
+                value="{{ user.first_name }}"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="last_name" class="form-label">Last Name</label>
+              <input
+                type="text"
+                class="form-control"
+                id="last_name"
+                name="last_name"
+                value="{{ user.last_name }}"
+                required
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="email" class="form-label">Email Address</label>
+              <input
+                type="email"
+                class="form-control"
+                id="email"
+                value="{{ user.email }}"
+                readonly
+              />
+              <div class="form-text">Email cannot be changed</div>
+            </div>
+            <div class="col-md-6">
+              <label for="phone_number" class="form-label">Phone Number</label>
+              <input
+                type="tel"
+                class="form-control"
+                id="phone_number"
+                name="phone_number"
+                value="{{ profile.phone_number|default:'' }}"
+              />
+            </div>
+            <div class="col-12">
+              <label for="address" class="form-label">Address</label>
+              <textarea
+                class="form-control"
+                id="address"
+                name="address"
+                rows="3"
+              >
+{{ profile.address|default:'' }}</textarea
+              >
+            </div>
+          </div>
+
+          <hr class="my-4" />
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="date_of_birth" class="form-label"
+                >Date of Birth</label
+              >
+              <input
+                type="date"
+                class="form-control"
+                id="date_of_birth"
+                name="date_of_birth"
+                value="{% if profile.date_of_birth %}{{ profile.date_of_birth|date:'Y-m-d' }}{% endif %}"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="nationality" class="form-label">Nationality</label>
+              <input
+                type="text"
+                class="form-control"
+                id="nationality"
+                name="nationality"
+                value="{{ profile.nationality|default:'' }}"
+              />
+            </div>
+            <div class="col-md-6">
+              <label for="passport_number" class="form-label"
+                >Passport Number</label
+              >
+              <input
+                type="text"
+                class="form-control"
+                id="passport_number"
+                name="passport_number"
+                value="{{ profile.passport_number|default:'' }}"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="card-footer text-end">
+          <a
+            href="{% url 'accounts:profile' %}"
+            class="btn btn-outline-secondary me-2"
+          >
+            Cancel
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Account Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <p>
+            <strong><i class="fas fa-user-tag me-2"></i>Username:</strong> {{
+            user.username }}
+          </p>
+          <p>
+            <strong><i class="fas fa-clock me-2"></i>Joined:</strong> {{
+            user.date_joined|date:"F d, Y" }}
+          </p>
+          <p>
+            <strong
+              ><i class="fas fa-user-shield me-2"></i>Account Type:</strong
+            >
+            {{ user.get_role_display }}
+          </p>
+          <div class="alert alert-info mt-3">
+            <i class="fas fa-info-circle me-2"></i>
+            <small
+              >Keep your personal information up to date to ensure smooth travel
+              experience.</small
+            >
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0"><i class="fas fa-shield-alt me-2"></i>Security</h3>
+        </div>
+        <div class="card-body">
+          <p class="mb-3">
+            <i class="fas fa-key me-2 text-muted"></i>
+            <a href="{% url 'accounts:password_reset' %}" class="link-primary"
+              >Reset your password</a
+            >
+          </p>
+
+          <div class="alert alert-warning mt-3">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <small
+              >For security reasons, we will send a password reset link to your
+              registered email address.</small
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

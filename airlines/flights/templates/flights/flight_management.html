@@ -1,0 +1,158 @@
+{% extends "base.html" %} {% load static %} {% block title %}{{ title }}{%
+endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-plane-departure me-2 text-primary"></i>
+        Flight Management
+      </h1>
+      <p class="lead text-muted">
+        Manage your flight schedule, create, update, and delete flights.
+      </p>
+    </div>
+    <div class="col-md-4 text-end align-self-center">
+      <a href="{% url 'flights:flight_create' %}" class="btn btn-primary">
+        <i class="fas fa-plus me-2"></i>
+        Add New Flight
+      </a>
+      <a
+        href="{% url 'flights:generate_flights' %}"
+        class="btn btn-outline-secondary ms-2"
+      >
+        <i class="fas fa-calendar-plus me-2"></i>
+        Generate Flights
+      </a>
+    </div>
+  </div>
+
+  <!-- Stats Section -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-4">
+      <div class="card h-100 bg-light border-primary">
+        <div class="card-body text-center">
+          <h1 class="display-4 fw-bold text-primary">{{ total_flights }}</h1>
+          <p class="text-muted">Total Flights</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="card h-100 bg-light border-success">
+        <div class="card-body text-center">
+          <h1 class="display-4 fw-bold text-success">
+            {{ scheduled_flights }}
+          </h1>
+          <p class="text-muted">Scheduled</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="card h-100 bg-light border-danger">
+        <div class="card-body text-center">
+          <h1 class="display-4 fw-bold text-danger">{{ cancelled_flights }}</h1>
+          <p class="text-muted">Cancelled</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3 mb-4">
+      <div class="card h-100 bg-light border-warning">
+        <div class="card-body text-center">
+          <h1 class="display-4 fw-bold text-warning">{{ delayed_flights }}</h1>
+          <p class="text-muted">Delayed</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Upcoming Flights Table -->
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">
+        <i class="fas fa-calendar me-2"></i>Upcoming Flights ({{ today|date:"M
+        d, Y" }} - {{ end_date|date:"M d, Y" }})
+      </h3>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th>Flight</th>
+              <th>Route</th>
+              <th>Departure</th>
+              <th>Arrival</th>
+              <th>Status</th>
+              <th>Aircraft</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if flights %} {% for flight in flights %}
+            <tr>
+              <td><strong>{{ flight.flight_number }}</strong></td>
+              <td>{{ flight.origin.code }} → {{ flight.destination.code }}</td>
+              <td>{{ flight.scheduled_departure|date:"M d, Y H:i" }}</td>
+              <td>{{ flight.scheduled_arrival|date:"M d, Y H:i" }}</td>
+              <td>
+                {% if flight.status == 'scheduled' %}
+                <span class="badge bg-success">Scheduled</span>
+                {% elif flight.status == 'cancelled' %}
+                <span class="badge bg-danger">Cancelled</span>
+                {% elif flight.status == 'delayed' %}
+                <span class="badge bg-warning">Delayed</span>
+                {% elif flight.status == 'in_air' %}
+                <span class="badge bg-info">In Air</span>
+                {% elif flight.status == 'landed' %}
+                <span class="badge bg-primary">Landed</span>
+                {% else %}
+                <span class="badge bg-secondary"
+                  >{{ flight.status|title }}</span
+                >
+                {% endif %}
+              </td>
+              <td>{{ flight.aircraft.registration }}</td>
+              <td>
+                <div class="btn-group btn-group-sm">
+                  <a
+                    href="{% url 'flights:flight_detail' flight.id %}"
+                    class="btn btn-outline-primary"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a
+                    href="{% url 'flights:flight_update' flight.id %}"
+                    class="btn btn-outline-secondary"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </a>
+                  <a
+                    href="{% url 'flights:flight_delete' flight.id %}"
+                    class="btn btn-outline-danger"
+                  >
+                    <i class="fas fa-trash"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %} {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-4">
+                <div class="alert alert-info mb-0">
+                  <i class="fas fa-info-circle me-2"></i>
+                  No flights found in the selected date range.
+                </div>
+              </td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card-footer">
+      <a href="{% url 'flights:flight_list' %}" class="btn btn-outline-primary"
+        >View All Flights</a
+      >
+    </div>
+  </div>
+</div>
+{% endblock %}

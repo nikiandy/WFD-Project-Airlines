@@ -1,0 +1,376 @@
+{% extends "base.html" %} {% load static %} {% block title %}Flight {{
+flight.flight_number }} Details{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-plane me-2 text-primary"></i>
+        Flight {{ flight.flight_number }}
+      </h1>
+      <p class="lead text-muted">
+        {{ flight.origin.name }} ({{ flight.origin.code }}) to {{
+        flight.destination.name }} ({{ flight.destination.code }})
+      </p>
+    </div>
+    <div class="col-md-4 text-end align-self-center">
+      {% if user.is_staff or user.role == 'planning_manager' %}
+      <div class="btn-group">
+        <a
+          href="{% url 'flights:flight_update' flight.id %}"
+          class="btn btn-outline-primary"
+        >
+          <i class="fas fa-edit me-2"></i>
+          Edit Flight
+        </a>
+        <a
+          href="{% url 'flights:flight_delete' flight.id %}"
+          class="btn btn-outline-danger"
+        >
+          <i class="fas fa-trash-alt me-2"></i>
+          Delete
+        </a>
+      </div>
+      {% endif %}
+      <a
+        href="{% url 'flights:flight_list' %}"
+        class="btn btn-outline-secondary ms-2"
+      >
+        <i class="fas fa-arrow-left me-2"></i>
+        Back to Flights
+      </a>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Flight Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row mb-4">
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <div class="flight-icon me-3">
+                  <i class="fas fa-plane-departure text-primary fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{ flight.origin.name }}</h5>
+                  <div class="text-muted">{{ flight.origin.code }}</div>
+                  <div class="fs-5 fw-bold">
+                    {{ flight.scheduled_departure|date:"H:i" }}
+                  </div>
+                  <div class="small text-muted">
+                    {{ flight.scheduled_departure|date:"D, d M Y" }}
+                  </div>
+                  <div class="small">
+                    Terminal: {{ flight.departure_terminal|default:"N/A" }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="d-flex align-items-center mb-3">
+                <div class="flight-icon me-3">
+                  <i class="fas fa-plane-arrival text-success fa-2x"></i>
+                </div>
+                <div>
+                  <h5 class="mb-0">{{ flight.destination.name }}</h5>
+                  <div class="text-muted">{{ flight.destination.code }}</div>
+                  <div class="fs-5 fw-bold">
+                    {{ flight.scheduled_arrival|date:"H:i" }}
+                  </div>
+                  <div class="small text-muted">
+                    {{ flight.scheduled_arrival|date:"D, d M Y" }}
+                  </div>
+                  <div class="small">
+                    Terminal: {{ flight.arrival_terminal|default:"N/A" }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mb-3">
+            <div class="col-12 text-center">
+              <div class="flight-duration pb-2">
+                <div class="flight-timeline position-relative">
+                  <div class="flight-line"></div>
+                  <div class="flight-icon flight-start"></div>
+                  <div class="flight-icon flight-end"></div>
+                </div>
+                <div class="mt-2">
+                  <span class="badge bg-info text-dark">
+                    <i class="fas fa-clock me-1"></i>
+                    {{ flight.duration_formatted }}
+                  </span>
+                  <span class="small text-muted ms-2"
+                    >{{ flight.distance_km }} km</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <h5 class="border-bottom pb-2">Status</h5>
+              <div class="d-flex align-items-center mb-3">
+                <div class="me-3">
+                  {% if flight.status == 'scheduled' %}
+                  <span class="badge bg-success p-2"
+                    ><i class="fas fa-check me-1"></i> Scheduled</span
+                  >
+                  {% elif flight.status == 'delayed' %}
+                  <span class="badge bg-warning text-dark p-2"
+                    ><i class="fas fa-exclamation-triangle me-1"></i>
+                    Delayed</span
+                  >
+                  {% elif flight.status == 'departed' %}
+                  <span class="badge bg-primary p-2"
+                    ><i class="fas fa-plane-departure me-1"></i> Departed</span
+                  >
+                  {% elif flight.status == 'in_air' %}
+                  <span class="badge bg-info text-dark p-2"
+                    ><i class="fas fa-plane me-1"></i> In Air</span
+                  >
+                  {% elif flight.status == 'landed' %}
+                  <span class="badge bg-primary p-2"
+                    ><i class="fas fa-plane-arrival me-1"></i> Landed</span
+                  >
+                  {% elif flight.status == 'cancelled' %}
+                  <span class="badge bg-danger p-2"
+                    ><i class="fas fa-times me-1"></i> Cancelled</span
+                  >
+                  {% else %}
+                  <span class="badge bg-secondary p-2"
+                    >{{ flight.get_status_display }}</span
+                  >
+                  {% endif %}
+                </div>
+                {% if flight.status_reason %}
+                <div class="small text-muted">{{ flight.status_reason }}</div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="col-md-6">
+              <h5 class="border-bottom pb-2">Flight Type</h5>
+              <div class="mb-3">
+                <div class="badge bg-secondary p-2">
+                  {% if flight.is_international %}
+                  <i class="fas fa-globe me-1"></i> International {% else %}
+                  <i class="fas fa-flag me-1"></i> Domestic {% endif %}
+                </div>
+                <div class="badge bg-secondary p-2 ms-2">
+                  {% if flight.is_return_flight %}
+                  <i class="fas fa-exchange-alt me-1"></i> Return Flight {% else
+                  %} <i class="fas fa-long-arrow-alt-right me-1"></i> One Way {%
+                  endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-plane me-2"></i>
+            Aircraft Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h5 class="border-bottom pb-2">Aircraft</h5>
+              <p>
+                <i class="fas fa-plane text-muted me-2"></i>
+                {{ flight.aircraft.aircraft_type.manufacturer }} {{
+                flight.aircraft.aircraft_type.model }}
+              </p>
+              <p>
+                <i class="fas fa-fingerprint text-muted me-2"></i>
+                Registration:
+                <strong>{{ flight.aircraft.registration }}</strong>
+              </p>
+              <p>
+                <i class="fas fa-birthday-cake text-muted me-2"></i>
+                Age: {{ flight.aircraft.age_years }} years
+              </p>
+            </div>
+            <div class="col-md-6">
+              <h5 class="border-bottom pb-2">Seating Information</h5>
+              <div class="mb-2">
+                <i class="fas fa-users text-muted me-2"></i>
+                Total capacity:
+                <strong>{{ flight.aircraft.aircraft_type.total_seats }}</strong>
+                seats
+              </div>
+              <div class="d-flex flex-wrap mt-3">
+                <div class="me-3 mb-2">
+                  <span class="badge bg-danger">
+                    <i class="fas fa-star me-1"></i>
+                    First Class: {{
+                    flight.aircraft.aircraft_type.first_class_seats|default:"0"
+                    }}
+                  </span>
+                </div>
+                <div class="me-3 mb-2">
+                  <span class="badge bg-info text-dark">
+                    <i class="fas fa-star-half-alt me-1"></i>
+                    Business: {{
+                    flight.aircraft.aircraft_type.business_class_seats|default:"0"
+                    }}
+                  </span>
+                </div>
+                <div class="me-3 mb-2">
+                  <span class="badge bg-success">
+                    <i class="fas fa-chair me-1"></i>
+                    Economy: {{
+                    flight.aircraft.aircraft_type.economy_class_seats|default:"0"
+                    }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-success text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-ticket-alt me-2"></i>
+            Pricing Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h5 class="border-bottom pb-2">Base Fares</h5>
+            <ul class="list-group">
+              {% for price in flight.prices.all %}
+              <li
+                class="list-group-item d-flex justify-content-between align-items-center"
+              >
+                <span>
+                  {% if price.travel_class.name == 'First Class' %}
+                  <i class="fas fa-star text-danger me-2"></i>
+                  {% elif price.travel_class.name == 'Business' %}
+                  <i class="fas fa-star-half-alt text-info me-2"></i>
+                  {% else %}
+                  <i class="fas fa-chair text-success me-2"></i>
+                  {% endif %} {{ price.travel_class.name }}
+                </span>
+                <span class="badge bg-primary rounded-pill"
+                  >{{ price.base_price }} €</span
+                >
+              </li>
+              {% empty %}
+              <li class="list-group-item text-center text-muted">
+                <i class="fas fa-info-circle me-2"></i>
+                No pricing information available
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+
+          <div class="mt-4 text-center">
+            <a
+              href="{% url 'bookings:booking_create' %}?flight_id={{ flight.id }}"
+              class="btn btn-success btn-lg"
+            >
+              <i class="fas fa-ticket-alt me-2"></i>
+              Book This Flight
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-info text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>
+            Additional Information
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <h5 class="border-bottom pb-2">Route Information</h5>
+            <p>
+              <i class="fas fa-code me-2 text-muted"></i>
+              Route Code: <strong>{{ flight.route.code }}</strong>
+            </p>
+            <p>
+              <i class="fas fa-clock me-2 text-muted"></i>
+              Average Duration: {{ flight.route.duration_minutes }} minutes
+            </p>
+            <p>
+              <i class="fas fa-ruler me-2 text-muted"></i>
+              Distance: {{ flight.route.distance_km }} km
+            </p>
+          </div>
+
+          {% if flight.notes %}
+          <div class="mb-3">
+            <h5 class="border-bottom pb-2">Notes</h5>
+            <p>{{ flight.notes }}</p>
+          </div>
+          {% endif %}
+
+          <div class="mb-3">
+            <h5 class="border-bottom pb-2">Flight Created</h5>
+            <p>
+              <i class="fas fa-calendar-alt me-2 text-muted"></i>
+              {{ flight.created_at|date:"F j, Y" }}
+            </p>
+            {% if flight.updated_at %}
+            <p>
+              <i class="fas fa-edit me-2 text-muted"></i>
+              Last updated: {{ flight.updated_at|date:"F j, Y" }}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
+<style>
+  .flight-timeline {
+    height: 5px;
+    margin: 20px 0;
+  }
+  .flight-line {
+    position: absolute;
+    height: 2px;
+    background-color: #ccc;
+    top: 50%;
+    left: 10%;
+    right: 10%;
+    transform: translateY(-50%);
+  }
+  .flight-icon {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .flight-start {
+    left: 10%;
+    background-color: #0d6efd;
+  }
+  .flight-end {
+    right: 10%;
+    background-color: #198754;
+  }
+</style>
+{% endblock %}

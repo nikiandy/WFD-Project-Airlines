@@ -1,0 +1,291 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}My Qualifications{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>My Qualifications</h1>
+            <p class="text-muted">View your certifications, licenses, and training qualifications</p>
+        </div>
+        <div class="col-md-auto">
+            <a href="{% url 'crew:crew_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    <!-- Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filter & Options</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'crew:crew_qualification_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="qualification_type">Qualification Type</label>
+                            <select class="form-select" id="qualification_type" name="qualification_type">
+                                <option value="">All Types</option>
+                                <option value="license" {% if request.GET.qualification_type == 'license' %}selected{% endif %}>Flight License</option>
+                                <option value="aircraft_type" {% if request.GET.qualification_type == 'aircraft_type' %}selected{% endif %}>Aircraft Type Rating</option>
+                                <option value="medical" {% if request.GET.qualification_type == 'medical' %}selected{% endif %}>Medical Certification</option>
+                                <option value="safety" {% if request.GET.qualification_type == 'safety' %}selected{% endif %}>Safety Training</option>
+                                <option value="security" {% if request.GET.qualification_type == 'security' %}selected{% endif %}>Security Training</option>
+                                <option value="language" {% if request.GET.qualification_type == 'language' %}selected{% endif %}>Language Proficiency</option>
+                                <option value="instructor" {% if request.GET.qualification_type == 'instructor' %}selected{% endif %}>Instructor Rating</option>
+                                <option value="examiner" {% if request.GET.qualification_type == 'examiner' %}selected{% endif %}>Examiner Rating</option>
+                                <option value="special" {% if request.GET.qualification_type == 'special' %}selected{% endif %}>Special Qualification</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="all" {% if request.GET.status == 'all' %}selected{% endif %}>All</option>
+                                <option value="valid" {% if request.GET.status == 'valid' or not request.GET.status %}selected{% endif %}>Valid</option>
+                                <option value="expiring" {% if request.GET.status == 'expiring' %}selected{% endif %}>Expiring Soon</option>
+                                <option value="expired" {% if request.GET.status == 'expired' %}selected{% endif %}>Expired</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <div class="form-group">
+                            <label for="show_inactive">Show Inactive</label>
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="show_inactive" name="show_inactive" value="true" {% if show_inactive %}checked{% endif %}>
+                                <label class="form-check-label" for="show_inactive">Include inactive</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-filter"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Qualifications Summary -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-success">
+                <div class="card-body">
+                    <h5 class="card-title">Valid Qualifications</h5>
+                    <p class="card-text display-6">{{ valid_count|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning">
+                <div class="card-body">
+                    <h5 class="card-title">Expiring Soon</h5>
+                    <p class="card-text display-6">{{ expiring_count|default:"0" }}</p>
+                    <p class="card-text">Within 90 days</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger">
+                <div class="card-body">
+                    <h5 class="card-title">Expired</h5>
+                    <p class="card-text display-6">{{ expired_count|default:"0" }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info">
+                <div class="card-body">
+                    <h5 class="card-title">Next Renewal</h5>
+                    <p class="card-text">{{ next_expiry|date:"M d, Y"|default:"N/A" }}</p>
+                    <p class="card-text">{{ next_expiry_qual|default:"No upcoming renewals" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Qualifications List -->
+    <div class="card">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Qualifications ({{ qualifications|length }})</h5>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Qualification</th>
+                        <th>Type</th>
+                        <th>Issue Date</th>
+                        <th>Expiry Date</th>
+                        <th>Status</th>
+                        <th>Details</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for qualification in qualifications %}
+                    <tr>
+                        <td>
+                            <span class="fw-bold">{{ qualification.title }}</span>
+                            {% if qualification.certification_number %}
+                            <br><small class="text-muted">Cert #: {{ qualification.certification_number }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ qualification.get_qualification_type_display }}</td>
+                        <td>{{ qualification.issue_date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if qualification.expiry_date %}
+                                {{ qualification.expiry_date|date:"M d, Y" }}
+                                {% if qualification.is_valid %}
+                                    {% if qualification.days_until_expiry < 90 and qualification.days_until_expiry >= 0 %}
+                                    <br><small class="text-warning">{{ qualification.days_until_expiry }} days remaining</small>
+                                    {% endif %}
+                                {% endif %}
+                            {% else %}
+                                <span class="text-muted">No expiry</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if qualification.is_valid %}
+                                {% if qualification.days_until_expiry < 30 and qualification.days_until_expiry >= 0 %}
+                                    <span class="badge bg-warning text-dark">Expiring Soon</span>
+                                {% else %}
+                                    <span class="badge bg-success">Valid</span>
+                                {% endif %}
+                            {% else %}
+                                {% if not qualification.is_active %}
+                                    <span class="badge bg-secondary">Inactive</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Expired</span>
+                                {% endif %}
+                            {% endif %}
+                        </td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#qualificationModal{{ qualification.id }}">
+                                <i class="fas fa-eye"></i> View
+                            </button>
+                            
+                            <!-- Qualification Details Modal -->
+                            <div class="modal fade" id="qualificationModal{{ qualification.id }}" tabindex="-1" aria-labelledby="qualificationModalLabel{{ qualification.id }}" aria-hidden="true">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="qualificationModalLabel{{ qualification.id }}">{{ qualification.title }}</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">BASIC INFORMATION</h6>
+                                                        <p>
+                                                            <strong>Type:</strong> {{ qualification.get_qualification_type_display }}<br>
+                                                            <strong>Certification #:</strong> {{ qualification.certification_number|default:"N/A" }}<br>
+                                                            <strong>Issuing Authority:</strong> {{ qualification.issuing_authority }}
+                                                        </p>
+                                                    </div>
+                                                    
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">DATES</h6>
+                                                        <p>
+                                                            <strong>Issue Date:</strong> {{ qualification.issue_date|date:"F d, Y" }}<br>
+                                                            <strong>Expiry Date:</strong> {% if qualification.expiry_date %}{{ qualification.expiry_date|date:"F d, Y" }}{% else %}No expiry{% endif %}<br>
+                                                            <strong>Status:</strong> 
+                                                            {% if qualification.is_valid %}
+                                                                {% if qualification.days_until_expiry < 30 and qualification.days_until_expiry >= 0 %}
+                                                                    <span class="badge bg-warning text-dark">Expiring Soon</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-success">Valid</span>
+                                                                {% endif %}
+                                                            {% else %}
+                                                                {% if not qualification.is_active %}
+                                                                    <span class="badge bg-secondary">Inactive</span>
+                                                                {% else %}
+                                                                    <span class="badge bg-danger">Expired</span>
+                                                                {% endif %}
+                                                            {% endif %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                
+                                                <div class="col-md-6">
+                                                    {% if qualification.qualification_type == 'aircraft_type' %}
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">AIRCRAFT TYPE</h6>
+                                                        <p>
+                                                            <strong>Model:</strong> {{ qualification.aircraft_type }}
+                                                        </p>
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    {% if qualification.qualification_type == 'language' %}
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">LANGUAGE PROFICIENCY</h6>
+                                                        <p>
+                                                            <strong>Level:</strong> {{ qualification.get_proficiency_level_display }}
+                                                        </p>
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">RECURRENT TRAINING</h6>
+                                                        <p>
+                                                            <strong>Last Training:</strong> {% if qualification.last_recurrent_training %}{{ qualification.last_recurrent_training|date:"F d, Y" }}{% else %}N/A{% endif %}<br>
+                                                            <strong>Next Training:</strong> {% if qualification.next_recurrent_training %}{{ qualification.next_recurrent_training|date:"F d, Y" }}{% else %}N/A{% endif %}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            {% if qualification.description or qualification.restrictions %}
+                                            <div class="row mt-3">
+                                                <div class="col-12">
+                                                    {% if qualification.description %}
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">DESCRIPTION</h6>
+                                                        <p>{{ qualification.description }}</p>
+                                                    </div>
+                                                    {% endif %}
+                                                    
+                                                    {% if qualification.restrictions %}
+                                                    <div class="mb-3">
+                                                        <h6 class="text-muted">RESTRICTIONS</h6>
+                                                        <p>{{ qualification.restrictions }}</p>
+                                                    </div>
+                                                    {% endif %}
+                                                </div>
+                                            </div>
+                                            {% endif %}
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                            <a href="#" class="btn btn-primary" onclick="window.print()">Print</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-certificate fa-3x mb-3"></i>
+                                <h5>No qualifications found</h5>
+                                <p>No qualifications match your filter criteria</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %} 

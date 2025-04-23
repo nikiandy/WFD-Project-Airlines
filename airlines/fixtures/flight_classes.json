@@ -1,0 +1,77 @@
+[
+  {
+    "model": "flights.flightclass",
+    "pk": 1,
+    "fields": {
+      "name": "Economy",
+      "code": "ECON",
+      "description": "Standard economy class with basic amenities",
+      "base_price_multiplier": 1.0,
+      "baggage_allowance": 1,
+      "meal_service": false,
+      "seat_pitch": 31,
+      "priority_boarding": false,
+      "lounge_access": false
+    }
+  },
+  {
+    "model": "flights.flightclass",
+    "pk": 2,
+    "fields": {
+      "name": "Economy Plus",
+      "code": "ECON+",
+      "description": "Enhanced economy with extra legroom and premium services",
+      "base_price_multiplier": 1.3,
+      "baggage_allowance": 1,
+      "meal_service": true,
+      "seat_pitch": 34,
+      "priority_boarding": false,
+      "lounge_access": false
+    }
+  },
+  {
+    "model": "flights.flightclass",
+    "pk": 3,
+    "fields": {
+      "name": "Premium Economy",
+      "code": "PREM",
+      "description": "Premium cabin with wider seats, improved meal service and extra amenities",
+      "base_price_multiplier": 1.7,
+      "baggage_allowance": 2,
+      "meal_service": true,
+      "seat_pitch": 38,
+      "priority_boarding": true,
+      "lounge_access": false
+    }
+  },
+  {
+    "model": "flights.flightclass",
+    "pk": 4,
+    "fields": {
+      "name": "Business",
+      "code": "BUS",
+      "description": "Business class with lie-flat seats, premium dining and dedicated service",
+      "base_price_multiplier": 2.5,
+      "baggage_allowance": 2,
+      "meal_service": true,
+      "seat_pitch": 60,
+      "priority_boarding": true,
+      "lounge_access": true
+    }
+  },
+  {
+    "model": "flights.flightclass",
+    "pk": 5,
+    "fields": {
+      "name": "First",
+      "code": "FIRST",
+      "description": "First class with private suites, gourmet dining and personalized service",
+      "base_price_multiplier": 4.0,
+      "baggage_allowance": 3,
+      "meal_service": true,
+      "seat_pitch": 80,
+      "priority_boarding": true,
+      "lounge_access": true
+    }
+  }
+]

@@ -1,0 +1,122 @@
+[
+  {
+    "model": "flights.route",
+    "pk": 1,
+    "fields": {
+      "origin": 1,
+      "destination": 2,
+      "code": "DUBLHR",
+      "distance_km": 450,
+      "duration_minutes": 85,
+      "is_active": true,
+      "notes": "Frequent daily service between Dublin and London",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 2,
+    "fields": {
+      "origin": 2,
+      "destination": 1,
+      "code": "LHRDUB",
+      "distance_km": 450,
+      "duration_minutes": 90,
+      "is_active": true,
+      "notes": "Frequent daily service between London and Dublin",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 3,
+    "fields": {
+      "origin": 1,
+      "destination": 3,
+      "code": "DUBCDG",
+      "distance_km": 780,
+      "duration_minutes": 120,
+      "is_active": true,
+      "notes": "Regular service between Dublin and Paris",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 4,
+    "fields": {
+      "origin": 3,
+      "destination": 1,
+      "code": "CDGDUB",
+      "distance_km": 780,
+      "duration_minutes": 125,
+      "is_active": true,
+      "notes": "Regular service between Paris and Dublin",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 5,
+    "fields": {
+      "origin": 1,
+      "destination": 4,
+      "code": "DUBFCO",
+      "distance_km": 1890,
+      "duration_minutes": 195,
+      "is_active": true,
+      "notes": "Service between Dublin and Rome",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 6,
+    "fields": {
+      "origin": 4,
+      "destination": 1,
+      "code": "FCODUB",
+      "distance_km": 1890,
+      "duration_minutes": 205,
+      "is_active": true,
+      "notes": "Service between Rome and Dublin",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 7,
+    "fields": {
+      "origin": 1,
+      "destination": 5,
+      "code": "DUBJFK",
+      "distance_km": 5120,
+      "duration_minutes": 430,
+      "is_active": true,
+      "notes": "Transatlantic service between Dublin and New York",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.route",
+    "pk": 8,
+    "fields": {
+      "origin": 5,
+      "destination": 1,
+      "code": "JFKDUB",
+      "distance_km": 5120,
+      "duration_minutes": 390,
+      "is_active": true,
+      "notes": "Transatlantic service between New York and Dublin",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  }
+]

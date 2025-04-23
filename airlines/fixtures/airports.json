@@ -1,0 +1,97 @@
+[
+  {
+    "model": "flights.airport",
+    "pk": 1,
+    "fields": {
+      "code": "DUB",
+      "icao_code": "EIDW",
+      "name": "Dublin Airport",
+      "city": "Dublin",
+      "country": "Ireland",
+      "latitude": 53.421333,
+      "longitude": -6.270075,
+      "timezone": "Europe/Dublin",
+      "elevation": 242,
+      "is_active": true,
+      "is_hub": true,
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.airport",
+    "pk": 2,
+    "fields": {
+      "code": "LHR",
+      "icao_code": "EGLL",
+      "name": "London Heathrow Airport",
+      "city": "London",
+      "country": "United Kingdom",
+      "latitude": 51.4775,
+      "longitude": -0.461389,
+      "timezone": "Europe/London",
+      "elevation": 83,
+      "is_active": true,
+      "is_hub": false,
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.airport",
+    "pk": 3,
+    "fields": {
+      "code": "CDG",
+      "icao_code": "LFPG",
+      "name": "Paris Charles de Gaulle Airport",
+      "city": "Paris",
+      "country": "France",
+      "latitude": 49.0097,
+      "longitude": 2.5479,
+      "timezone": "Europe/Paris",
+      "elevation": 119,
+      "is_active": true,
+      "is_hub": false,
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.airport",
+    "pk": 4,
+    "fields": {
+      "code": "FCO",
+      "icao_code": "LIRF",
+      "name": "Rome Fiumicino Airport",
+      "city": "Rome",
+      "country": "Italy",
+      "latitude": 41.8002,
+      "longitude": 12.2388,
+      "timezone": "Europe/Rome",
+      "elevation": 13,
+      "is_active": true,
+      "is_hub": false,
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  },
+  {
+    "model": "flights.airport",
+    "pk": 5,
+    "fields": {
+      "code": "JFK",
+      "icao_code": "KJFK",
+      "name": "John F. Kennedy International Airport",
+      "city": "New York",
+      "country": "United States",
+      "latitude": 40.6413,
+      "longitude": -73.7781,
+      "timezone": "America/New_York",
+      "elevation": 13,
+      "is_active": true,
+      "is_hub": false,
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-01-01T00:00:00Z"
+    }
+  }
+]

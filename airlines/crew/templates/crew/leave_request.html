@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Request Leave{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Request Leave</h1>
+            <p class="text-muted">Submit a new leave request</p>
+        </div>
+        <div class="col-md-auto">
+            <a href="{% url 'crew:crew_leave_list' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Leaves
+            </a>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <!-- Leave Request Form -->
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Leave Request Form</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                                {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.leave_type.id_for_label }}" class="form-label">Leave Type *</label>
+                                {{ form.leave_type.errors }}
+                                <select name="{{ form.leave_type.name }}" id="{{ form.leave_type.id_for_label }}" class="form-select {% if form.leave_type.errors %}is-invalid{% endif %}" required>
+                                    <option value="" selected disabled>Select leave type</option>
+                                    {% for value, text in form.leave_type.field.choices %}
+                                        <option value="{{ value }}" {% if form.leave_type.value == value %}selected{% endif %}>{{ text }}</option>
+                                    {% endfor %}
+                                </select>
+                                {% if form.leave_type.help_text %}
+                                <div class="form-text">{{ form.leave_type.help_text }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.start_date.id_for_label }}" class="form-label">Start Date *</label>
+                                {{ form.start_date.errors }}
+                                <input type="date" name="{{ form.start_date.name }}" id="{{ form.start_date.id_for_label }}" 
+                                    class="form-control {% if form.start_date.errors %}is-invalid{% endif %}" 
+                                    value="{{ form.start_date.value|date:'Y-m-d' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.end_date.id_for_label }}" class="form-label">End Date *</label>
+                                {{ form.end_date.errors }}
+                                <input type="date" name="{{ form.end_date.name }}" id="{{ form.end_date.id_for_label }}" 
+                                    class="form-control {% if form.end_date.errors %}is-invalid{% endif %}" 
+                                    value="{{ form.end_date.value|date:'Y-m-d' }}" required>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.reason.id_for_label }}" class="form-label">Reason *</label>
+                            {{ form.reason.errors }}
+                            <textarea name="{{ form.reason.name }}" id="{{ form.reason.id_for_label }}" 
+                                class="form-control {% if form.reason.errors %}is-invalid{% endif %}" 
+                                rows="4" required>{{ form.reason.value|default:'' }}</textarea>
+                            <div class="form-text">Please provide detailed information about your leave request.</div>
+                        </div>
+                        
+                        {% if form.medical_certificate %}
+                        <div class="mb-3">
+                            <label for="{{ form.medical_certificate.id_for_label }}" class="form-label">Medical Certificate Reference</label>
+                            {{ form.medical_certificate.errors }}
+                            <input type="text" name="{{ form.medical_certificate.name }}" id="{{ form.medical_certificate.id_for_label }}" 
+                                class="form-control {% if form.medical_certificate.errors %}is-invalid{% endif %}" 
+                                value="{{ form.medical_certificate.value|default:'' }}">
+                            <div class="form-text">Required for sick leave requests exceeding 3 days.</div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <a href="{% url 'crew:crew_leave_list' %}" class="btn btn-outline-secondary me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Submit Request</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <!-- Information Card -->
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Leave Request Guidelines</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-3">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <strong>Submission Deadline:</strong> Annual leave requests should be submitted at least 2 weeks in advance.
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <strong>Medical Certificate:</strong> Required for sick leave requests exceeding 3 days.
+                        </li>
+                        <li class="mb-3">
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <strong>Approval Process:</strong> Your request will be reviewed and you'll be notified via email once a decision is made.
+                        </li>
+                        <li>
+                            <i class="fas fa-info-circle text-info me-2"></i>
+                            <strong>Cancellation:</strong> Leave requests can be cancelled if they're still pending approval.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Leave Balance Card -->
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Your Leave Balance</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Annual Leave
+                            <span class="badge bg-primary rounded-pill">14 days</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Sick Leave
+                            <span class="badge bg-primary rounded-pill">10 days</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            Compassionate Leave
+                            <span class="badge bg-primary rounded-pill">5 days</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

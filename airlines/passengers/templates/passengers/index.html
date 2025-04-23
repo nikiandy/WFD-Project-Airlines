@@ -1,0 +1,172 @@
+{% extends "base.html" %} {% load static %} {% block title %}Passenger
+Services{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-user-circle me-2 text-primary"></i>
+        Passenger Services
+      </h1>
+      <p class="lead text-muted">
+        Manage your travel experience and personal preferences
+      </p>
+    </div>
+  </div>
+
+  <div class="row">
+    <!-- Personal Information Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-id-card text-primary me-2"></i>
+            Personal Information
+          </h5>
+          <p class="card-text">
+            View and update your personal details, contact information, and
+            identification documents.
+          </p>
+          <ul class="list-group list-group-flush mb-3">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              Profile Completeness
+              <span class="badge bg-success rounded-pill">85%</span>
+            </li>
+            <li class="list-group-item d-flex align-items-center">
+              <i class="fas fa-exclamation-circle text-warning me-2"></i>
+              Your passport needs renewal in 3 months
+            </li>
+          </ul>
+          <a href="#" class="btn btn-primary">Update Profile</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Loyalty Program Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-award text-primary me-2"></i>
+            Loyalty Program
+          </h5>
+          <p class="card-text">
+            Manage your loyalty membership and track your points and benefits.
+          </p>
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h6 class="mb-0">Silver Tier</h6>
+              <small class="text-muted">Member since Jan 2023</small>
+            </div>
+            <span class="badge bg-secondary">12,500 points</span>
+          </div>
+          <div class="progress mb-3" style="height: 10px">
+            <div
+              class="progress-bar bg-primary"
+              role="progressbar"
+              style="width: 65%"
+              aria-valuenow="65"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            ></div>
+          </div>
+          <small class="text-muted"
+            >7,500 more points needed for Gold Tier</small
+          >
+          <div class="mt-3">
+            <a href="#" class="btn btn-primary">View Benefits</a>
+            <a href="#" class="btn btn-outline-secondary">Redeem Points</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Travel History Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-plane text-primary me-2"></i>
+            Travel History
+          </h5>
+          <p class="card-text">
+            View your past flights and upcoming travel plans.
+          </p>
+          <div class="list-group mb-3">
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">Dublin to London</h6>
+                <small>2 days ago</small>
+              </div>
+              <small class="text-muted">Flight SK298 • Economy Class</small>
+            </div>
+            <div class="list-group-item">
+              <div class="d-flex w-100 justify-content-between">
+                <h6 class="mb-1">Paris to Dublin</h6>
+                <small>Last week</small>
+              </div>
+              <small class="text-muted">Flight SK103 • Business Class</small>
+            </div>
+          </div>
+          <a href="#" class="btn btn-primary">View All Trips</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preferences Card -->
+    <div class="col-md-6 mb-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">
+            <i class="fas fa-sliders-h text-primary me-2"></i>
+            Travel Preferences
+          </h5>
+          <p class="card-text">
+            Set your seat, meal, and other travel preferences for smoother
+            journeys.
+          </p>
+          <div class="mb-3">
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value=""
+                id="prefWindowSeat"
+                checked
+              />
+              <label class="form-check-label" for="prefWindowSeat">
+                Window seat preferred
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value=""
+                id="prefVegetarian"
+                checked
+              />
+              <label class="form-check-label" for="prefVegetarian">
+                Vegetarian meal
+              </label>
+            </div>
+            <div class="form-check">
+              <input
+                class="form-check-input"
+                type="checkbox"
+                value=""
+                id="prefSpecialAssist"
+              />
+              <label class="form-check-label" for="prefSpecialAssist">
+                Special assistance required
+              </label>
+            </div>
+          </div>
+          <a href="#" class="btn btn-primary">Manage Preferences</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

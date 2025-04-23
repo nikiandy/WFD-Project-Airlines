@@ -1,0 +1,63 @@
+{% extends "base.html" %} {% load static %} {% block title %}Crew Portal{%
+endblock %} {% block content %}
+<div class="container my-5">
+  <h1>Crew Portal</h1>
+  <p>Welcome to the Airlines Crew Portal</p>
+
+  <div class="row mt-4">
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-tachometer-alt fa-3x text-primary mb-3"></i>
+          <h5>Dashboard</h5>
+          <a href="{% url 'crew:crew_dashboard' %}" class="btn btn-primary mt-2"
+            >View Dashboard</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-calendar-alt fa-3x text-primary mb-3"></i>
+          <h5>Schedules</h5>
+          <a
+            href="{% url 'crew:crew_schedule_list' %}"
+            class="btn btn-primary mt-2"
+            >View Schedules</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-certificate fa-3x text-primary mb-3"></i>
+          <h5>Qualifications</h5>
+          <a
+            href="{% url 'crew:crew_qualification_list' %}"
+            class="btn btn-primary mt-2"
+            >View Qualifications</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body text-center">
+          <i class="fas fa-plane-departure fa-3x text-primary mb-3"></i>
+          <h5>Leave Requests</h5>
+          <a
+            href="{% url 'crew:crew_leave_list' %}"
+            class="btn btn-primary mt-2"
+            >View Leave Requests</a
+          >
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

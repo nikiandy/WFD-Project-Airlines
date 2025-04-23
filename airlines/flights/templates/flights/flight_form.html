@@ -1,0 +1,235 @@
+{% extends "base.html" %} {% load static %} {% block title %} {% if flight.id %}
+Edit Flight {{ flight.flight_number }} {% else %} Create New Flight {% endif %}
+{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4 align-items-center">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-plane me-2 text-primary"></i>
+        {% if flight.id %}Edit Flight {{ flight.flight_number }}{% else %}Create
+        New Flight{% endif %}
+      </h1>
+      <p class="lead text-muted">
+        {% if flight.id %}Update the flight information and schedule{% else
+        %}Add a new flight to the system{% endif %}
+      </p>
+    </div>
+    <div class="col-md-4 text-end">
+      <a
+        href="{% url 'flights:flight_list' %}"
+        class="btn btn-outline-secondary"
+      >
+        <i class="fas fa-arrow-left me-2"></i> Back to Flight List
+      </a>
+    </div>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0"><i class="fas fa-edit me-2"></i>Flight Details</h3>
+    </div>
+    <div class="card-body">
+      <form method="post" enctype="multipart/form-data">
+        {% csrf_token %} {% if form.non_field_errors %}
+        <div class="alert alert-danger">
+          {% for error in form.non_field_errors %}
+          <p>{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Basic Information -->
+        <div class="row mb-4">
+          <div class="col-12"><h4 class="mb-3">Basic Information</h4></div>
+
+          <div class="col-md-4 mb-3">
+            <label
+              for="{{ form.flight_number.id_for_label }}"
+              class="form-label"
+              >Flight Number *</label
+            >
+            {{ form.flight_number }} {% if form.flight_number.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.flight_number.errors }}
+            </div>
+            {% endif %}
+            <div class="form-text">Example: SK1234</div>
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="{{ form.route.id_for_label }}" class="form-label"
+              >Route *</label
+            >
+            {{ form.route }} {% if form.route.errors %}
+            <div class="invalid-feedback d-block">{{ form.route.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="{{ form.aircraft.id_for_label }}" class="form-label"
+              >Aircraft *</label
+            >
+            {{ form.aircraft }} {% if form.aircraft.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.aircraft.errors }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Schedule Information -->
+        <div class="row mb-4">
+          <div class="col-12"><h4 class="mb-3">Schedule Information</h4></div>
+
+          <div class="col-md-6 mb-3">
+            <label
+              for="{{ form.scheduled_departure.id_for_label }}"
+              class="form-label"
+              >Scheduled Departure *</label
+            >
+            {{ form.scheduled_departure }} {% if form.scheduled_departure.errors
+            %}
+            <div class="invalid-feedback d-block">
+              {{ form.scheduled_departure.errors }}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label
+              for="{{ form.scheduled_arrival.id_for_label }}"
+              class="form-label"
+              >Scheduled Arrival *</label
+            >
+            {{ form.scheduled_arrival }} {% if form.scheduled_arrival.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.scheduled_arrival.errors }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Status & Pricing -->
+        <div class="row mb-4">
+          <div class="col-12"><h4 class="mb-3">Status & Pricing</h4></div>
+
+          <div class="col-md-4 mb-3">
+            <label for="{{ form.status.id_for_label }}" class="form-label"
+              >Status</label
+            >
+            {{ form.status }} {% if form.status.errors %}
+            <div class="invalid-feedback d-block">{{ form.status.errors }}</div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="{{ form.base_price.id_for_label }}" class="form-label"
+              >Base Price (€) *</label
+            >
+            {{ form.base_price }} {% if form.base_price.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.base_price.errors }}
+            </div>
+            {% endif %}
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label for="{{ form.is_active.id_for_label }}" class="form-label"
+              >Active Status</label
+            >
+            <div class="form-check form-switch mt-2">
+              {{ form.is_active }}
+              <label
+                class="form-check-label"
+                for="{{ form.is_active.id_for_label }}"
+                >Flight is active and bookable</label
+              >
+            </div>
+            {% if form.is_active.errors %}
+            <div class="invalid-feedback d-block">
+              {{ form.is_active.errors }}
+            </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Additional Information -->
+        <div class="row mb-4">
+          <div class="col-12"><h4 class="mb-3">Additional Information</h4></div>
+          <div class="col-12 mb-3">
+            <label for="{{ form.notes.id_for_label }}" class="form-label"
+              >Notes</label
+            >
+            {{ form.notes }} {% if form.notes.errors %}
+            <div class="invalid-feedback d-block">{{ form.notes.errors }}</div>
+            {% endif %}
+            <div class="form-text">
+              Internal notes about this flight (not visible to customers)
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="d-flex mt-4">
+          <button type="submit" class="btn btn-primary btn-lg me-2">
+            <i class="fas fa-save me-2"></i>
+            {% if flight.id %}Update Flight{% else %}Create Flight{% endif %}
+          </button>
+          <a
+            href="{% url 'flights:flight_list' %}"
+            class="btn btn-outline-secondary btn-lg"
+            >Cancel</a
+          >
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+// DOM element selection
+    const formControls = document.querySelectorAll("input, select, textarea");
+    formControls.forEach((el) => {
+// Conditional logic
+      if (el.tagName === "SELECT") el.classList.add("form-select");
+      else if (el.type === "checkbox") el.classList.add("form-check-input");
+      else el.classList.add("form-control");
+
+// Conditional logic
+      if (el.type === "datetime-local") {
+        flatpickr(el, {
+          enableTime: true,
+          dateFormat: "Y-m-d H:i",
+          time_24hr: true,
+        });
+      }
+    });
+
+    const routeSelect = document.getElementById(
+      "{{ form.route.id_for_label }}"
+    );
+// Function definition
+    function updateFlightNumber() {
+      const opt = routeSelect.options[routeSelect.selectedIndex];
+// Conditional logic
+      if (opt) {
+        const code = opt.text.split(" - ")[0];
+// Conditional logic
+        if (code) {
+          const fnInput = document.getElementById(
+            "{{ form.flight_number.id_for_label }}"
+          );
+// Conditional logic
+          if (!fnInput.value) {
+            const rand = Math.floor(1000 + Math.random() * 9000);
+            fnInput.value = `SK${code}${rand}`;
+          }
+        }
+      }
+    }
+// Conditional logic
+    if (routeSelect) routeSelect.addEventListener("change", updateFlightNumber);
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,85 @@
+{% extends "base.html" %} {% load static %} {% block title %}Generate Flights -
+{{ title }}{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-plane me-2 text-primary"></i>
+        Generate Flight Schedules
+      </h1>
+      <p class="lead text-muted">
+        Automatically generate flights from schedules
+      </p>
+    </div>
+  </div>
+
+  <div class="card shadow">
+    <div class="card-header bg-primary text-white">
+      <h3 class="mb-0">
+        <i class="fas fa-clipboard-check me-2"></i>Generation Results
+      </h3>
+    </div>
+    <div class="card-body">
+      {% if error %}
+      <div class="alert alert-danger">
+        <i class="fas fa-exclamation-circle me-2"></i> {{ error }}
+      </div>
+      {% else %}
+      <div class="alert alert-success">
+        <h4 class="alert-heading">
+          <i class="fas fa-check-circle me-2"></i>Flight Generation Complete!
+        </h4>
+        <p>Successfully generated flights for {{ days_generated }} days.</p>
+        <hr />
+        <p class="mb-0">
+          Created {{ flights_created }} new flights from {{ start_date }} to {{
+          end_date }}.
+        </p>
+      </div>
+
+      <div class="row mt-4">
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-calendar-check text-primary me-2"></i>Date
+                Range
+              </h5>
+              <p>
+                <strong>From:</strong> {{ start_date|date:"F j, Y" }}<br />
+                <strong>To:</strong> {{ end_date|date:"F j, Y" }}
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="card h-100">
+            <div class="card-body">
+              <h5 class="card-title">
+                <i class="fas fa-plane-departure text-primary me-2"></i>Flights
+                Created
+              </h5>
+              <div class="display-4 text-center my-3">
+                {{ flights_created }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="mt-4 text-center">
+        <a href="{% url 'flights:flight_list' %}" class="btn btn-primary">
+          <i class="fas fa-list me-2"></i>View All Flights
+        </a>
+        <a
+          href="{% url 'flights:index' %}"
+          class="btn btn-outline-secondary ms-2"
+        >
+          <i class="fas fa-arrow-left me-2"></i>Back to Flight Management
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

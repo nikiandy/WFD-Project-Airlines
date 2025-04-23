@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Bookings Management{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Bookings Management</h1>
+            <p class="text-muted">Manage flight bookings, view details, and track booking status</p>
+        </div>
+        <div class="col-md-auto">
+            <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> Create New Booking
+            </a>
+        </div>
+    </div>
+    
+    <!-- Search and Filter Section -->
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Search & Filter</h5>
+        </div>
+        <div class="card-body">
+            <form method="get" action="{% url 'bookings:booking_list' %}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="search">Search</label>
+                            <input type="text" class="form-control" id="search" name="search" 
+                                placeholder="Booking reference or passenger name" 
+                                value="{{ request.GET.search|default:'' }}">
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="status">Status</label>
+                            <select class="form-select" id="status" name="status">
+                                <option value="">All Statuses</option>
+                                <option value="confirmed" {% if request.GET.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
+                                <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                                <option value="canceled" {% if request.GET.status == 'canceled' %}selected{% endif %}>Canceled</option>
+                                <option value="checked_in" {% if request.GET.status == 'checked_in' %}selected{% endif %}>Checked In</option>
+                                <option value="completed" {% if request.GET.status == 'completed' %}selected{% endif %}>Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="form-group">
+                            <label for="date_range">Date Range</label>
+                            <select class="form-select" id="date_range" name="date_range">
+                                <option value="">All Dates</option>
+                                <option value="today" {% if request.GET.date_range == 'today' %}selected{% endif %}>Today</option>
+                                <option value="yesterday" {% if request.GET.date_range == 'yesterday' %}selected{% endif %}>Yesterday</option>
+                                <option value="this_week" {% if request.GET.date_range == 'this_week' %}selected{% endif %}>This Week</option>
+                                <option value="last_week" {% if request.GET.date_range == 'last_week' %}selected{% endif %}>Last Week</option>
+                                <option value="this_month" {% if request.GET.date_range == 'this_month' %}selected{% endif %}>This Month</option>
+                                <option value="last_month" {% if request.GET.date_range == 'last_month' %}selected{% endif %}>Last Month</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Apply Filters
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Bookings List -->
+    <div class="card">
+        <div class="card-header bg-light d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Bookings ({{ page_obj.paginator.count }})</h5>
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Export
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="{% url 'bookings:export_bookings' %}?format=csv{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">CSV</a></li>
+                    <li><a class="dropdown-item" href="{% url 'bookings:export_bookings' %}?format=excel{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">Excel</a></li>
+                    <li><a class="dropdown-item" href="{% url 'bookings:export_bookings' %}?format=pdf{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">PDF</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Reference</th>
+                        <th>Flight</th>
+                        <th>Passenger(s)</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Total Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>
+                            <span class="fw-bold">{{ booking.booking_reference }}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div>
+                                    <div class="fw-bold">{{ booking.flight.flight_number }}</div>
+                                    <small class="text-muted">{{ booking.flight.origin.code }} → {{ booking.flight.destination.code }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            {% for passenger in booking.passengers.all|slice:":2" %}
+                                {{ passenger.get_full_name }}{% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                            {% if booking.passengers.count > 2 %}
+                                <span class="badge bg-secondary">+{{ booking.passengers.count|add:"-2" }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div>{{ booking.booking_date|date:"M d, Y" }}</div>
+                            <small class="text-muted">{{ booking.flight.departure_time|date:"H:i" }}</small>
+                        </td>
+                        <td>
+                            {% if booking.status == 'confirmed' %}
+                                <span class="badge bg-success">Confirmed</span>
+                            {% elif booking.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                            {% elif booking.status == 'canceled' %}
+                                <span class="badge bg-danger">Canceled</span>
+                            {% elif booking.status == 'checked_in' %}
+                                <span class="badge bg-info">Checked In</span>
+                            {% elif booking.status == 'completed' %}
+                                <span class="badge bg-secondary">Completed</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ booking.status|title }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            ${{ booking.total_amount }}
+                        </td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="dropdownMenuButton{{ booking.id }}" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Actions
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton{{ booking.id }}">
+                                    <li><a class="dropdown-item" href="{% url 'bookings:booking_detail' booking.booking_reference %}">
+                                        <i class="fas fa-eye fa-fw"></i> View Details
+                                    </a></li>
+                                    <li><a class="dropdown-item" href="{% url 'bookings:booking_edit' booking.booking_reference %}">
+                                        <i class="fas fa-edit fa-fw"></i> Edit
+                                    </a></li>
+                                    {% if booking.status != 'canceled' and booking.status != 'completed' %}
+                                    <li><hr class="dropdown-divider"></li>
+                                    {% if booking.status == 'confirmed' %}
+                                    <li><a class="dropdown-item" href="{% url 'bookings:booking_checkin' booking.booking_reference %}">
+                                        <i class="fas fa-check-circle fa-fw"></i> Check-in
+                                    </a></li>
+                                    {% endif %}
+                                    <li><a class="dropdown-item text-danger" href="{% url 'bookings:booking_cancel' booking.booking_reference %}">
+                                        <i class="fas fa-times-circle fa-fw"></i> Cancel
+                                    </a></li>
+                                    {% endif %}
+                                </ul>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <div class="text-muted">
+                                <i class="fas fa-plane-slash fa-3x mb-3"></i>
+                                <h5>No bookings found</h5>
+                                <p>Try changing your search criteria or create a new booking</p>
+                                <a href="{% url 'bookings:booking_create' %}" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Create New Booking
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if is_paginated %}
+        <div class="card-footer">
+            <nav aria-label="Bookings pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="First">
+                            <span aria-hidden="true">&laquo;&laquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;&laquo;</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&laquo;</a>
+                    </li>
+                    {% endif %}
+                    
+                    {% for i in paginator.page_range %}
+                        {% if page_obj.number == i %}
+                            <li class="page-item active"><a class="page-link" href="#">{{ i }}</a></li>
+                        {% elif i > page_obj.number|add:'-3' and i < page_obj.number|add:'3' %}
+                            <li class="page-item"><a class="page-link" href="?page={{ i }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}">{{ i }}</a></li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.urlencode %}&{{ request.GET.urlencode }}{% endif %}" aria-label="Last">
+                            <span aria-hidden="true">&raquo;&raquo;</span>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;</a>
+                    </li>
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1" aria-disabled="true">&raquo;&raquo;</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

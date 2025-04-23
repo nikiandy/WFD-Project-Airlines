@@ -1,0 +1,192 @@
+{% extends "base.html" %} {% load static %} {% block title %}My Profile - Sky
+Airlines{% endblock %} {% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-lg-4 mb-4">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0"><i class="fas fa-user me-2"></i>Profile</h3>
+        </div>
+        <div class="card-body text-center">
+          <div class="mb-4">
+            <i class="fas fa-user-circle fa-6x text-primary"></i>
+          </div>
+          <h4>{{ user.first_name }} {{ user.last_name }}</h4>
+          <p class="text-muted">{{ user.email }}</p>
+          <p class="badge bg-secondary">{{ user.get_role_display }}</p>
+          <hr />
+          <div class="text-start mt-3">
+            <p>
+              <strong><i class="fas fa-user-tag me-2"></i>Username:</strong> {{
+              user.username }}
+            </p>
+            <p>
+              <strong><i class="fas fa-clock me-2"></i>Joined:</strong> {{
+              user.date_joined|date:"F d, Y" }}
+            </p>
+            {% if profile.phone_number %}
+            <p>
+              <strong><i class="fas fa-phone me-2"></i>Phone:</strong> {{
+              profile.phone_number }}
+            </p>
+            {% endif %}
+          </div>
+        </div>
+        <div class="card-footer">
+          <a
+            href="{% url 'accounts:edit_profile' %}"
+            class="btn btn-primary btn-sm w-100"
+          >
+            <i class="fas fa-edit me-2"></i>Edit Profile
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-8">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Personal Information
+          </h3>
+        </div>
+        <div class="card-body">
+          {% if messages %}
+          <div class="messages mb-4">
+            {% for message in messages %}
+            <div
+              class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+              role="alert"
+            >
+              {{ message }}
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="alert"
+                aria-label="Close"
+              ></button>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <div class="card border-light h-100">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <i class="fas fa-address-card me-2"></i>Contact & Address
+                  </h5>
+                  <p class="card-text">
+                    {% if profile.address %}
+                    <strong>Address:</strong> {{ profile.address }}<br />
+                    {% else %}
+                    <span class="text-muted"
+                      >No address information provided</span
+                    >
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <div class="card border-light h-100">
+                <div class="card-body">
+                  <h5 class="card-title">
+                    <i class="fas fa-passport me-2"></i>Travel Documents
+                  </h5>
+                  <p class="card-text">
+                    {% if profile.passport_number %}
+                    <strong>Passport:</strong> {{ profile.passport_number }}<br />
+                    <strong>Nationality:</strong> {{ profile.nationality }} {%
+                    else %}
+                    <span class="text-muted"
+                      >No passport information provided</span
+                    >
+                    {% endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0"><i class="fas fa-plane me-2"></i>Recent Bookings</h3>
+        </div>
+        <div class="card-body">
+          {% if recent_bookings %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Reference</th>
+                  <th>Date</th>
+                  <th>Flight</th>
+                  <th>Status</th>
+                  <th>Amount</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for booking in recent_bookings %}
+                <tr>
+                  <td class="fw-bold">{{ booking.reference_number }}</td>
+                  <td>{{ booking.created_at|date:"M d, Y" }}</td>
+                  <td>
+                    {% with pb=booking.get_first_passenger_booking %} {% if pb
+                    and pb.flight %} {{ pb.flight.origin.code }} → {{
+                    pb.flight.destination.code }} {% else %} N/A {% endif %} {%
+                    endwith %}
+                  </td>
+                  <td>
+                    <span
+                      class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning{% elif booking.status == 'cancelled' %}danger{% else %}info{% endif %}"
+                    >
+                      {{ booking.get_status_display }}
+                    </span>
+                  </td>
+                  <td>${{ booking.total_amount|floatformat:2 }}</td>
+                  <td>
+                    <a
+                      href="{% url 'bookings:booking_detail' booking.reference_number %}"
+                      class="btn btn-sm btn-outline-primary"
+                    >
+                      <i class="fas fa-eye"></i>
+                    </a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted text-center py-4">
+            <i class="fas fa-ticket-alt fa-3x mb-3 d-block"></i>
+            No recent bookings found.
+          </p>
+          <div class="text-center">
+            <a
+              href="{% url 'bookings:booking_create' %}"
+              class="btn btn-primary"
+            >
+              <i class="fas fa-search me-2"></i>Browse Flights
+            </a>
+          </div>
+          {% endif %}
+        </div>
+        {% if recent_bookings %}
+        <div class="card-footer text-center">
+          <a href="{% url 'bookings:index' %}" class="btn btn-primary">
+            <i class="fas fa-list me-2"></i>View All Bookings
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

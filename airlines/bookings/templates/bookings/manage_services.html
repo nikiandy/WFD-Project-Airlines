@@ -1,0 +1,302 @@
+{% extends "base.html" %} {% load static %} {% block title %}Manage Additional
+Services{% endblock %} {% block content %}
+<div class="container my-5">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5 fw-bold">
+        <i class="fas fa-concierge-bell me-2 text-primary"></i>
+        Manage Additional Services
+      </h1>
+      <p class="lead text-muted">
+        Add or remove extra services for your booking
+      </p>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <span class="badge bg-primary p-2 fs-6">
+        <i class="fas fa-tag me-1"></i>
+        {{ booking.reference_number }}
+      </span>
+    </div>
+  </div>
+
+  {% if messages %}
+  <div class="messages mb-4">
+    {% for message in messages %}
+    <div
+      class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %} alert-dismissible fade show"
+      role="alert"
+    >
+      {{ message }}
+      <button
+        type="button"
+        class="btn-close"
+        data-bs-dismiss="alert"
+        aria-label="Close"
+      ></button>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <div class="row">
+    <div class="col-lg-8">
+      <form method="post" class="card shadow mb-4">
+        {% csrf_token %}
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-cogs me-2"></i>Additional Services
+          </h3>
+        </div>
+        <div class="card-body">
+          <div class="row g-4">
+            <div class="col-md-6">
+              <div
+                class="form-check custom-service-check p-3 h-100 border rounded"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="on"
+                  id="priorityBoarding"
+                  name="priority_boarding"
+                  {%
+                  if
+                  booking.has_priority_boarding
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label class="form-check-label w-100" for="priorityBoarding">
+                  <div
+                    class="d-flex align-items-center justify-content-between mb-2"
+                  >
+                    <span class="fw-bold"
+                      ><i class="fas fa-user-check text-primary me-2"></i
+                      >Priority Boarding</span
+                    >
+                    <span class="badge bg-primary rounded-pill"
+                      >$15 per passenger</span
+                    >
+                  </div>
+                  <p class="text-muted mb-0 small">
+                    Be among the first to board the aircraft and secure your
+                    overhead luggage space.
+                  </p>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div
+                class="form-check custom-service-check p-3 h-100 border rounded"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="on"
+                  id="extraBaggage"
+                  name="extra_baggage"
+                  {%
+                  if
+                  booking.extra_baggage
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label class="form-check-label w-100" for="extraBaggage">
+                  <div
+                    class="d-flex align-items-center justify-content-between mb-2"
+                  >
+                    <span class="fw-bold"
+                      ><i class="fas fa-suitcase text-primary me-2"></i>Extra
+                      Baggage</span
+                    >
+                    <span class="badge bg-primary rounded-pill"
+                      >$35 per passenger</span
+                    >
+                  </div>
+                  <p class="text-muted mb-0 small">
+                    Add an additional checked bag (up to 23kg) for each
+                    passenger.
+                  </p>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div
+                class="form-check custom-service-check p-3 h-100 border rounded"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="on"
+                  id="travelInsurance"
+                  name="travel_insurance"
+                  {%
+                  if
+                  booking.has_travel_insurance
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label class="form-check-label w-100" for="travelInsurance">
+                  <div
+                    class="d-flex align-items-center justify-content-between mb-2"
+                  >
+                    <span class="fw-bold"
+                      ><i class="fas fa-umbrella text-primary me-2"></i>Travel
+                      Insurance</span
+                    >
+                    <span class="badge bg-primary rounded-pill"
+                      >$25 per passenger</span
+                    >
+                  </div>
+                  <p class="text-muted mb-0 small">
+                    Comprehensive travel insurance covering flight
+                    cancellations, medical emergencies, and baggage loss.
+                  </p>
+                </label>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div
+                class="form-check custom-service-check p-3 h-100 border rounded"
+              >
+                <input
+                  class="form-check-input"
+                  type="checkbox"
+                  value="on"
+                  id="premiumMeal"
+                  name="premium_meal"
+                  {%
+                  if
+                  booking.has_premium_meal
+                  %}checked{%
+                  endif
+                  %}
+                />
+                <label class="form-check-label w-100" for="premiumMeal">
+                  <div
+                    class="d-flex align-items-center justify-content-between mb-2"
+                  >
+                    <span class="fw-bold"
+                      ><i class="fas fa-utensils text-primary me-2"></i>Premium
+                      Meal</span
+                    >
+                    <span class="badge bg-primary rounded-pill"
+                      >$20 per passenger</span
+                    >
+                  </div>
+                  <p class="text-muted mb-0 small">
+                    Enjoy a gourmet meal with complimentary beverages during
+                    your flight.
+                  </p>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-footer d-flex justify-content-between">
+          <a
+            href="{% url 'bookings:booking_detail' booking.reference_number %}"
+            class="btn btn-outline-secondary"
+          >
+            <i class="fas fa-times me-2"></i>Cancel
+          </a>
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save me-2"></i>Save Changes
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-info-circle me-2"></i>Booking Summary
+          </h3>
+        </div>
+        <div class="card-body">
+          <p>
+            <strong>Status:</strong>
+            <span
+              class="badge bg-{% if booking.status == 'confirmed' %}success{% elif booking.status == 'pending' %}warning{% else %}danger{% endif %}"
+            >
+              {{ booking.get_status_display }}
+            </span>
+          </p>
+          <p><strong>Passengers:</strong> {{ booking.passengers.count }}</p>
+          <p>
+            <strong>Base Fare:</strong> ${{ booking.base_amount|floatformat:2 }}
+          </p>
+          <p>
+            <strong>Taxes & Fees:</strong> ${{ booking.tax_amount|floatformat:2
+            }}
+          </p>
+          <p>
+            <strong>Additional Services:</strong> ${{
+            booking.additional_services_amount|floatformat:2 }}
+          </p>
+          <hr />
+          <p class="d-flex justify-content-between fw-bold">
+            <span>Total:</span>
+            <span>${{ booking.total_amount|floatformat:2 }}</span>
+          </p>
+        </div>
+      </div>
+
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="mb-0">
+            <i class="fas fa-plane me-2"></i>Flight Information
+          </h3>
+        </div>
+        <div class="card-body">
+          {% with pb=booking.get_first_passenger_booking %} {% if pb and
+          pb.flight %}
+          <p><strong>Flight:</strong> {{ pb.flight.flight_number }}</p>
+          <p>
+            <strong>From:</strong> {{ pb.flight.origin.city }} ({{
+            pb.flight.origin.code }})
+          </p>
+          <p>
+            <strong>To:</strong> {{ pb.flight.destination.city }} ({{
+            pb.flight.destination.code }})
+          </p>
+          <p>
+            <strong>Date:</strong> {{ pb.flight.scheduled_departure|date:"F j,
+            Y" }}
+          </p>
+          <p>
+            <strong>Time:</strong> {{ pb.flight.scheduled_departure|date:"g:i A"
+            }} - {{ pb.flight.scheduled_arrival|date:"g:i A" }}
+          </p>
+          {% else %}
+          <p class="text-muted">No flight information available</p>
+          {% endif %} {% endwith %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_css %}
+<style>
+  .custom-service-check {
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .custom-service-check:hover {
+    background-color: rgba(13, 110, 253, 0.05);
+    border-color: rgba(13, 110, 253, 0.3) !important;
+  }
+/* Form elements */
+  .form-check-input:checked + .form-check-label .custom-service-check,
+  .custom-service-check:has(.form-check-input:checked) {
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.5) !important;
+  }
+</style>
+{% endblock %}

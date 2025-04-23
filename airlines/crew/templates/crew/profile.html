@@ -1,0 +1,315 @@
+{% extends "base.html" %} {% load static %} {% block title %}My Profile{%
+endblock %} {% block content %}
+<div class="container mt-5">
+  <!-- Header with back button -->
+  <div class="d-flex align-items-center mb-4">
+    <a href="{% url 'crew:dashboard' %}" class="btn btn-outline-secondary me-3">
+      <i class="fas fa-arrow-left"></i> Back to Dashboard
+    </a>
+    <h2 class="mb-0">My Profile</h2>
+  </div>
+
+  <div class="row">
+    <!-- Profile Summary -->
+    <div class="col-lg-4 mb-4">
+      <div class="card border-primary">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-user"></i> Profile Summary</h5>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-4">
+            {% if crew_member.profile_image %}
+            <img
+              src="{{ crew_member.profile_image.url }}"
+              alt="Profile Image"
+              class="rounded-circle img-fluid mb-3"
+              style="width: 150px; height: 150px; object-fit: cover"
+            />
+            {% else %}
+            <div
+              class="bg-light rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3"
+              style="width: 150px; height: 150px"
+            >
+              <i class="fas fa-user fa-5x text-secondary"></i>
+            </div>
+            {% endif %}
+            <h4>{{ crew_member.user.get_full_name }}</h4>
+            <p class="text-muted">{{ crew_member.get_crew_type_display }}</p>
+            <div class="badge bg-primary">
+              Crew ID: {{ crew_member.crew_id }}
+            </div>
+          </div>
+
+          <ul class="list-group list-group-flush">
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>Base</span>
+              <span class="fw-bold"
+                >{{ crew_member.base_airport.code }} ({{
+                crew_member.base_airport.name }})</span
+              >
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>Status</span>
+              <span class="fw-bold"
+                >{{ crew_member.get_employment_status_display }}</span
+              >
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>Join Date</span>
+              <span class="fw-bold"
+                >{{ crew_member.join_date|date:"M d, Y" }}</span
+              >
+            </li>
+            <li
+              class="list-group-item d-flex justify-content-between align-items-center"
+            >
+              <span>Flight Hours</span>
+              <span class="fw-bold"
+                >{{ crew_member.total_flight_hours|floatformat:1 }}</span
+              >
+            </li>
+          </ul>
+        </div>
+        <div class="card-footer">
+          <button
+            class="btn btn-outline-primary w-100"
+            data-bs-toggle="modal"
+            data-bs-target="#uploadPhotoModal"
+          >
+            <i class="fas fa-camera"></i> Update Photo
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Personal Information -->
+    <div class="col-lg-8">
+      <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">
+            <i class="fas fa-id-card"></i> Personal Information
+          </h5>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% url 'crew:update_profile' %}">
+            {% csrf_token %} {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+              {% for error in form.non_field_errors %} {{ error }} {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">First Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="first_name"
+                  value="{{ crew_member.user.first_name }}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Last Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="last_name"
+                  value="{{ crew_member.user.last_name }}"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Email Address</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  name="email"
+                  value="{{ crew_member.user.email }}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Phone Number</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  name="phone"
+                  value="{{ crew_member.phone }}"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-12">
+                <label class="form-label">Address</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="address"
+                  value="{{ crew_member.address }}"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">Emergency Contact Name</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  name="emergency_contact_name"
+                  value="{{ crew_member.emergency_contact_name }}"
+                  required
+                />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Emergency Contact Phone</label>
+                <input
+                  type="tel"
+                  class="form-control"
+                  name="emergency_contact_phone"
+                  value="{{ crew_member.emergency_contact_phone }}"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i> Save Changes
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Account Settings -->
+      <div class="card">
+        <div class="card-header bg-secondary text-white">
+          <h5 class="mb-0"><i class="fas fa-key"></i> Account Settings</h5>
+        </div>
+        <div class="card-body">
+          <form method="post" action="{% url 'crew:change_password' %}">
+            {% csrf_token %}
+
+            <div class="row mb-3">
+              <div class="col-md-12">
+                <label class="form-label">Current Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="current_password"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label class="form-label">New Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="new_password1"
+                  required
+                />
+                <div class="form-text">
+                  Password must be at least 8 characters with letters and
+                  numbers
+                </div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Confirm New Password</label>
+                <input
+                  type="password"
+                  class="form-control"
+                  name="new_password2"
+                  required
+                />
+              </div>
+            </div>
+
+            <div class="d-grid">
+              <button type="submit" class="btn btn-secondary">
+                <i class="fas fa-key"></i> Change Password
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Upload Photo Modal -->
+<div
+  class="modal fade"
+  id="uploadPhotoModal"
+  tabindex="-1"
+  aria-labelledby="uploadPhotoModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="uploadPhotoModalLabel">
+          Update Profile Photo
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <form
+        method="post"
+        action="{% url 'crew:update_photo' %}"
+        enctype="multipart/form-data"
+      >
+        {% csrf_token %}
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="profile_image" class="form-label"
+              >Select a new photo</label
+            >
+            <input
+              class="form-control"
+              type="file"
+              id="profile_image"
+              name="profile_image"
+              accept="image/*"
+              required
+            />
+            <div class="form-text">
+              Maximum file size: 5MB. Recommended dimensions: 400x400 pixels.
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            data-bs-dismiss="modal"
+          >
+            Cancel
+          </button>
+          <button type="submit" class="btn btn-primary">Upload Photo</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
